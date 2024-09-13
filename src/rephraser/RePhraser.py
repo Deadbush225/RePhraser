@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowIcon(QIcon(os.path.join(basedir, "RePhrase.png")))
+        self.setWindowIcon(QIcon(os.path.join(basedir, "RePhraser.png")))
 
         # self.path holds the path of the currently open file.
         # If none, we haven't got a file open yet (or creating new).
