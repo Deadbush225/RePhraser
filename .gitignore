@@ -1,5 +1,5 @@
 DEL/
-src/__pycache__/
+__pycache__/
 *.uxf
 test/
 build/
