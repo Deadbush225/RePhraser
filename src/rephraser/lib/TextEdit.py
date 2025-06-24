@@ -6,6 +6,8 @@ from rephraser.lib.helper import *
 from rephraser.lib.Stores import store
 from rephraser.lib.qt_helper import HLine
 
+from rephraser.lib.logger import log, LogLevel
+
 import math
 
 
@@ -186,7 +188,7 @@ class TextEdit(QTextEdit):
         #     return
 
         if e.text().isalnum() or (e.text() == " "):
-            print("ALPHANUMERIC")
+            log.w("ALPHANUMERIC", LogLevel.INFO)
             self.textCursor().insertText(e.text(), self.defaultCharFormat)
             # self.parent_.update_format()
             return
