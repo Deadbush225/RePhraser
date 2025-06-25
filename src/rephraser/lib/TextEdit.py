@@ -5,11 +5,9 @@ from PyQt5.QtCore import *
 from rephraser.lib.helper import *
 from rephraser.lib.Stores import store
 from rephraser.lib.qt_helper import HLine
-
-from rephraser.lib.logger import log, LogLevel
+from rephraser.lib.Logger import Logger
 
 import math
-
 
 class PasteFromAuthorDialog(QDialog):
 
@@ -175,20 +173,8 @@ class TextEdit(QTextEdit):
         super().insertFromMimeData(source)
 
     def keyPressEvent(self, e):
-        # if e.key() == Qt.Key_Backspace:
-        #     self.textCursor().deletePreviousChar()
-        #     return
-        print("'" + e.text() + "'")
-
-        # if e.key() == Qt.Key_Backspace:
-        #     self.textCursor().deletePreviousChar()
-        #     return
-        # elif e.key() == Qt.Key_Delete:
-        #     self.textCursor().deleteChar()
-        #     return
-
         if e.text().isalnum() or (e.text() == " "):
-            log.w("ALPHANUMERIC", LogLevel.INFO)
+            Logger.w("ALPHANUMERIC", Logger.INFO)
             self.textCursor().insertText(e.text(), self.defaultCharFormat)
             # self.parent_.update_format()
             return
@@ -203,7 +189,7 @@ class TextEdit(QTextEdit):
 
     def setTextCharFormat(self, authorName):
         prop = store.author_dictionary[authorName]
-        print(prop)
+        Logger.w(prop, Logger.INFO)
 
         self.textCharFormat.setFontItalic(prop["italic"])
         self.textCharFormat.setFontWeight(prop["weight"])

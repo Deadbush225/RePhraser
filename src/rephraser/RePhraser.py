@@ -7,11 +7,7 @@ import os
 import sys
 import uuid
 import math
-
 import re
-
-# from zipfile import ZipFile
-
 import traceback
 
 from rephraser.lib.AuthorTable import AuthorTable
@@ -20,52 +16,37 @@ from rephraser.lib.TextEdit import TextEdit, PasteFromAuthorDialog
 from rephraser.lib.helper import *
 from rephraser.lib.Toolbar import Toolbar
 from rephraser.lib.DarkPallete import DarkPalette
+from rephraser.lib.Logger import Logger
 
 from rephraser import basedir
-
-import rephraser.images.images
+import rephraser.images.images # Resource file for the icons
+from rephraser.lib.DarkPallete import enable_dark_titlebar
 
 floor = math.floor
 
 IMAGE_EXTENSIONS = [".jpg", ".png", ".bmp"]
 HTML_EXTENSIONS = [".htm", ".html"]
 
-# old_basedir = os.path.dirname(__file__)
-# print(old_basedir)
-
-
 class MainWindow(QMainWindow):
-
+    changed = False
+    
     def __init__(self):
         super().__init__()
 
+        enable_dark_titlebar(self)
+        
+        self.setMinimumSize(700, 400)
+
         self.setWindowIcon(QIcon(os.path.join(basedir, "RePhraser.png")))
 
-        # self.path holds the path of the currently open file.
-        # If none, we haven't got a file open yet (or creating new).
         self.path = None
 
-        # self.layout = QStackedLayout()
         self.layout = QVBoxLayout()
-
-        # mandatoryFileOpenContainer = QWidget()
-
-        # fileOpen_layout = QVBoxLayout()
-        # fileOpen_layout.setAlignment(Qt.AlignCenter)
-
-        # fileOpen_label = QLabel("Hey, Open a Project Folder first")
-        # fileOpen_btn = QPushButton("Open Dir")
-        # fileOpen_btn.clicked.connect(self.open_directory)
-
-        # fileOpen_layout.addWidget(fileOpen_label)
-        # fileOpen_layout.addWidget(fileOpen_btn)
-
-        # mandatoryFileOpenContainer.setLayout(fileOpen_layout)
-        # self.layout.addWidget(mandatoryFileOpenContainer)
 
         self.editor = TextEdit(parent=self)
         self.editor.setVerticalScrollBar(ScrollBar(Qt.Vertical))
         self.editor.setTabStopDistance(40)
+        self.editor.textChanged.connect(lambda: setattr(self, 'changed', True))
 
         # Setup the QTextEdit editor configuration
         # self.editor.setAutoFormatting(QTextEdit.AutoAll)
@@ -91,8 +72,10 @@ class MainWindow(QMainWindow):
         # ━━━━━━━━━━━━━━━━━━━━━━━━━━━ Dock Widget ━━━━━━━━━━━━━━━━━━━━━━━━━━━ #
         dockwidget = QDockWidget("Change Author")
         dockwidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        dockwidget.setMaximumWidth(176)
+        dockwidget.setMaximumWidth(300)
         dockwidget.setMinimumWidth(165)
+
+        enable_dark_titlebar(dockwidget)
 
         dock_innerContainer = QWidget()
         dockwidget.setWidget(dock_innerContainer)
@@ -140,7 +123,6 @@ class MainWindow(QMainWindow):
         qApp.setStyleSheet("".join(open(os.path.join(basedir, "dark.qss")).readlines()))
 
     def block_signals(self, objects, b):
-        # print(objects)
         for o in objects:
             o.blockSignals(b)
 
@@ -234,6 +216,8 @@ class MainWindow(QMainWindow):
         try:
             with open(self.path, "w") as f:
                 f.write(text)
+                f.close()
+                self.changed = False
 
         except Exception as e:
             self.dialog_critical(str(e))
@@ -248,7 +232,7 @@ class MainWindow(QMainWindow):
 
         if not path:
             # If dialog is cancelled, will return ''
-            return
+            return 0
 
         text = (
             self.editor.toHtml()
@@ -259,6 +243,9 @@ class MainWindow(QMainWindow):
         try:
             with open(path, "w") as f:
                 f.write(text)
+                f.close()
+                self.changed = False
+                return 1
 
         except Exception as e:
             self.dialog_critical(str(e))
@@ -288,5 +275,34 @@ class MainWindow(QMainWindow):
         self.editor.setLineWrapMode(1 if self.editor.lineWrapMode() == 0 else 0)
 
     def closeEvent(self, e):
-        if self.editor.toPlainText():
-            self.file_save()
+        if not self.changed or self.editor.toPlainText() == "":
+            return
+        
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle("Unsaved Changes")
+        msg_box.setText("You have unsaved changes. Do you want to save them?")
+        save_btn = msg_box.addButton("Save", QMessageBox.AcceptRole)
+        discard_btn = msg_box.addButton("Discard", QMessageBox.DestructiveRole)
+        cancel_btn = msg_box.addButton("Cancel", QMessageBox.RejectRole)
+        msg_box.setDefaultButton(save_btn)
+        enable_dark_titlebar(msg_box)
+        msg_box.exec_()
+        clicked_button = msg_box.clickedButton()
+        if clicked_button == save_btn:
+            res = QMessageBox.Save
+        elif clicked_button == discard_btn:
+            res = QMessageBox.Discard
+        else:
+            res = QMessageBox.Cancel
+
+        if res == QMessageBox.Save:
+            if not self.file_save():
+                e.ignore()
+                return
+        elif res == QMessageBox.Cancel:
+            e.ignore()
+            return
+            
+    
+

@@ -68,3 +68,11 @@ HLine { /* https://stackoverflow.com/a/41495895/15870976 */
     border-bottom: 1px solid #4b4b4b;
     max-height: 0px
 }
+
+/* Scaling */
+QMenuBar { font-size: 10pt; }
+QMenu { font-size: 10pt; }
+
+
+* { font-size: 11pt}
+QPushButton { font-size: 10pt; padding: 0.25em 0.3em }

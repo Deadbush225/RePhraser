@@ -12,7 +12,7 @@ class Toolbar(QToolBar):
         super().__init__(*args, **kwargs)
 
         self.parent().addToolBar(self)
-        self.setIconSize(QSize(14, 14))
+        self.setIconSize(QSize(24, 24))
         file_menu = self.parent().menuBar().addMenu("&File")
 
         open_file_action = QAction(
@@ -52,9 +52,9 @@ class Toolbar(QToolBar):
         file_menu.addAction(print_action)
         self.addAction(print_action)
 
-        edit_toolbar = QToolBar("Edit")
-        edit_toolbar.setIconSize(QSize(16, 16))
-        self.parent().addToolBar(edit_toolbar)
+        self.edit_toolbar = QToolBar("Edit")
+        self.edit_toolbar.setIconSize(QSize(24, 24))
+        self.parent().addToolBar(self.edit_toolbar)
         edit_menu = self.parent().menuBar().addMenu("&Edit")
 
         undo_action = QAction(
@@ -73,7 +73,7 @@ class Toolbar(QToolBar):
         )
         redo_action.setStatusTip("Redo last change")
         redo_action.triggered.connect(self.parent().editor.redo)
-        edit_toolbar.addAction(redo_action)
+        self.edit_toolbar.addAction(redo_action)
         edit_menu.addAction(redo_action)
 
         edit_menu.addSeparator()
@@ -82,7 +82,7 @@ class Toolbar(QToolBar):
         cut_action.setStatusTip("Cut selected text")
         cut_action.setShortcut(QKeySequence.Cut)
         cut_action.triggered.connect(self.parent().editor.cut)
-        edit_toolbar.addAction(cut_action)
+        self.edit_toolbar.addAction(cut_action)
         edit_menu.addAction(cut_action)
 
         copy_action = QAction(
@@ -93,7 +93,7 @@ class Toolbar(QToolBar):
         copy_action.setStatusTip("Copy selected text")
         cut_action.setShortcut(QKeySequence.Copy)
         copy_action.triggered.connect(self.parent().editor.copy)
-        edit_toolbar.addAction(copy_action)
+        self.edit_toolbar.addAction(copy_action)
         edit_menu.addAction(copy_action)
 
         paste_action = QAction(
@@ -104,7 +104,7 @@ class Toolbar(QToolBar):
         paste_action.setStatusTip("Paste from clipboard")
         cut_action.setShortcut(QKeySequence.Paste)
         paste_action.triggered.connect(self.parent().editor.paste)
-        edit_toolbar.addAction(paste_action)
+        self.edit_toolbar.addAction(paste_action)
         edit_menu.addAction(paste_action)
 
         select_action = QAction(
@@ -130,9 +130,9 @@ class Toolbar(QToolBar):
         wrap_action.triggered.connect(self.parent().edit_toggle_wrap)
         edit_menu.addAction(wrap_action)
 
-        format_toolbar = QToolBar("Format")
-        format_toolbar.setIconSize(QSize(16, 16))
-        self.parent().addToolBar(format_toolbar)
+        self.format_toolbar = QToolBar("Format")
+        self.format_toolbar.setIconSize(QSize(24, 24))
+        self.parent().addToolBar(self.format_toolbar)
         format_menu = self.parent().menuBar().addMenu("&Format")
 
         # We need references to these actions/settings to update as selection changes, so attach to self.parent().
@@ -146,7 +146,7 @@ class Toolbar(QToolBar):
             font
         )  # needed, since line above doesn't fire "currentFontChanged"
 
-        format_toolbar.addWidget(self.parent().fonts)
+        self.format_toolbar.addWidget(self.parent().fonts)
 
         self.parent().fontsize = QComboBox()
         self.parent().fontsize.addItems([str(s) for s in FONT_SIZES])
@@ -156,7 +156,7 @@ class Toolbar(QToolBar):
         self.parent().fontsize.currentIndexChanged[str].connect(
             lambda s: self.parent().editor.setFontPointSize(float(s))
         )
-        format_toolbar.addWidget(self.parent().fontsize)
+        self.format_toolbar.addWidget(self.parent().fontsize)
 
         bold_image = QImage(":/icons/edit-bold.png")
         bold_image.invertPixels()
@@ -171,7 +171,7 @@ class Toolbar(QToolBar):
                 QFont.Bold if x else QFont.Normal
             )
         )
-        format_toolbar.addAction(self.parent().bold_action)
+        self.format_toolbar.addAction(self.parent().bold_action)
         format_menu.addAction(self.parent().bold_action)
 
         italic_image = QImage(":/icons/edit-italic.png")
@@ -185,7 +185,7 @@ class Toolbar(QToolBar):
         self.parent().italic_action.setShortcut(QKeySequence.Italic)
         self.parent().italic_action.setCheckable(True)
         self.parent().italic_action.toggled.connect(self.parent().editor.setFontItalic)
-        format_toolbar.addAction(self.parent().italic_action)
+        self.format_toolbar.addAction(self.parent().italic_action)
         format_menu.addAction(self.parent().italic_action)
 
         underline_image = QImage(":/icons/edit-underline.png")
@@ -201,7 +201,7 @@ class Toolbar(QToolBar):
         self.parent().underline_action.toggled.connect(
             self.parent().editor.setFontUnderline
         )
-        format_toolbar.addAction(self.parent().underline_action)
+        self.format_toolbar.addAction(self.parent().underline_action)
         format_menu.addAction(self.parent().underline_action)
 
         format_menu.addSeparator()
@@ -218,7 +218,7 @@ class Toolbar(QToolBar):
         self.parent().alignl_action.triggered.connect(
             lambda: self.parent().editor.setAlignment(Qt.AlignLeft)
         )
-        format_toolbar.addAction(self.parent().alignl_action)
+        self.format_toolbar.addAction(self.parent().alignl_action)
         format_menu.addAction(self.parent().alignl_action)
 
         alignc_image = QImage(":/icons/edit-alignment-center.png")
@@ -233,7 +233,7 @@ class Toolbar(QToolBar):
         self.parent().alignc_action.triggered.connect(
             lambda: self.parent().editor.setAlignment(Qt.AlignCenter)
         )
-        format_toolbar.addAction(self.parent().alignc_action)
+        self.format_toolbar.addAction(self.parent().alignc_action)
         format_menu.addAction(self.parent().alignc_action)
 
         alignr_image = QImage(":/icons/edit-alignment-right.png")
@@ -249,7 +249,7 @@ class Toolbar(QToolBar):
         self.parent().alignr_action.triggered.connect(
             lambda: self.parent().editor.setAlignment(Qt.AlignRight)
         )
-        format_toolbar.addAction(self.parent().alignr_action)
+        self.format_toolbar.addAction(self.parent().alignr_action)
         format_menu.addAction(self.parent().alignr_action)
 
         alignj_image = QImage(":/icons/edit-alignment-justify.png")
@@ -265,7 +265,7 @@ class Toolbar(QToolBar):
         self.parent().alignj_action.triggered.connect(
             lambda: self.parent().editor.setAlignment(Qt.AlignJustify)
         )
-        format_toolbar.addAction(self.parent().alignj_action)
+        self.format_toolbar.addAction(self.parent().alignj_action)
         format_menu.addAction(self.parent().alignj_action)
 
         format_group = QActionGroup(self.parent())
@@ -286,3 +286,29 @@ class Toolbar(QToolBar):
             self.parent().underline_action,
             # We don't need to disable signals for alignment, as they are paragraph-wide.
         ]
+
+        # At the end of your __init__ method
+        self.set_scaled_icons()
+
+    
+    # Add this function to your Toolbar class
+    def set_scaled_icons(self):
+        # Enable icon scaling
+        for toolbar in [self.actions(), self.edit_toolbar.actions(), self.format_toolbar.actions()]:
+            for action in toolbar:
+                if action.icon().isNull():
+                    continue
+                    
+                # Get the original icon
+                icon = action.icon()
+                pixmap = icon.pixmap(QSize(16, 16))
+                
+                # Create a scaled version
+                scaled_pixmap = pixmap.scaled(
+                    QSize(24, 24),  # Target size
+                    Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation
+                )
+                
+                # Set the scaled icon
+                action.setIcon(QIcon(scaled_pixmap))
