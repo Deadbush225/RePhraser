@@ -290,6 +290,17 @@ class Toolbar(QToolBar):
         # At the end of your __init__ method
         self.set_scaled_icons()
 
+        view_menu = self.parent().menuBar().addMenu("&View")
+
+        reset_view_action = QAction(
+            QIcon(""),
+            "Reset View",
+            self.parent(),
+        )
+        reset_view_action.setStatusTip("Reset View")
+        reset_view_action.triggered.connect(self.parent().createDock)
+        view_menu.addAction(reset_view_action)
+
     
     # Add this function to your Toolbar class
     def set_scaled_icons(self):

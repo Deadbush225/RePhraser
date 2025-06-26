@@ -29,7 +29,51 @@ HTML_EXTENSIONS = [".htm", ".html"]
 
 class MainWindow(QMainWindow):
     changed = False
+    dockwidget = None
+
+    def createDock(self):
+        dock_widgets = self.findChildren(QDockWidget)
+        if self.dockwidget in dock_widgets:
+            return
+
+        self.dockwidget = QDockWidget("Change Author")
+        self.dockwidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.dockwidget.setMaximumWidth(300)
+        self.dockwidget.setMinimumWidth(165)
+
+        enable_dark_titlebar(self.dockwidget)
+
+        dock_innerContainer = QWidget()
+        self.dockwidget.setWidget(dock_innerContainer)
+        dock_layout = QVBoxLayout(dock_innerContainer)
+
+        self.author_table = AuthorTable(parent=self)
+        dock_layout.addWidget(self.author_table)
+
+        addAuthor_btn = QPushButton("Add Author")
+        addAuthor_btn.clicked.connect(lambda: self.author_table.addAuthor())
+
+        resetFmt_btn = QPushButton("Reset Format")
+        resetFmt_btn.clicked.connect(lambda: self.editor.removeCharFormatSelection())
+
+        dock_layout.addWidget(addAuthor_btn)
+        dock_layout.addWidget(resetFmt_btn)
+
+        self.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+
+        # ━━━━━━━━━━━━━━━━━━━ Refresh Stylesheet ━━━━━━━━━━━━━━━━━━ #
+        self.refresh_btn = QPushButton("Refresh stylesheet")
+        self.refresh_btn.clicked.connect(self.refresh_stylesheet)
+        dock_layout.addWidget(self.refresh_btn)
+        
+        self.dockwidget.closeEvent = lambda event: self.on_dock_close(event)
     
+    def on_dock_close(self, event):
+        self.removeDockWidget(self.dockwidget)
+        self.dockwidget.deleteLater()
+        self.dockwidget = None
+        event.accept()
+
     def __init__(self):
         super().__init__()
 
@@ -66,34 +110,11 @@ class MainWindow(QMainWindow):
         # Uncomment to disable native menubar on Mac
         # self.menuBar().setNativeMenuBar(False)
 
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Toolbar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ #
+        # ━━━━━━━━━━━━━━━━━━━━━━━━ Toolbar ━━━━━━━━━━━━━━━━━━━━━━━━ #
         file_toolbar = Toolbar("File", parent=self)
 
-        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━ Dock Widget ━━━━━━━━━━━━━━━━━━━━━━━━━━━ #
-        dockwidget = QDockWidget("Change Author")
-        dockwidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        dockwidget.setMaximumWidth(300)
-        dockwidget.setMinimumWidth(165)
-
-        enable_dark_titlebar(dockwidget)
-
-        dock_innerContainer = QWidget()
-        dockwidget.setWidget(dock_innerContainer)
-        dock_layout = QVBoxLayout(dock_innerContainer)
-
-        self.author_table = AuthorTable(parent=self)
-        dock_layout.addWidget(self.author_table)
-
-        addAuthor_btn = QPushButton("Add Author")
-        addAuthor_btn.clicked.connect(lambda: self.author_table.addAuthor())
-
-        resetFmt_btn = QPushButton("Reset Format")
-        resetFmt_btn.clicked.connect(lambda: self.editor.removeCharFormatSelection())
-
-        dock_layout.addWidget(addAuthor_btn)
-        dock_layout.addWidget(resetFmt_btn)
-
-        self.addDockWidget(Qt.RightDockWidgetArea, dockwidget)
+        # ━━━━━━━━━━━━━━━━━━━━━━ Dock Widget ━━━━━━━━━━━━━━━━━━━━━━ #
+        self.createDock()
 
         # Initialize default font size.
         # self.editor.setFont(font)
@@ -108,10 +129,7 @@ class MainWindow(QMainWindow):
         # signals
         self.editor.selectionChanged.connect(self.update_format)
 
-        # ━━━━━━━━━━━━━━━━━━━━━━━━ Refresh Stylesheet ━━━━━━━━━━━━━━━━━━━━━━━ #
-        self.refresh_btn = QPushButton("Refresh stylesheet")
-        self.refresh_btn.clicked.connect(self.refresh_stylesheet)
-        dock_layout.addWidget(self.refresh_btn)
+        
 
         # Initialize.
         self.update_format()
