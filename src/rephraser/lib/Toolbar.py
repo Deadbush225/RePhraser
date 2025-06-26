@@ -8,6 +8,25 @@ FONT_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 18, 24, 36, 48, 64, 72, 96, 144, 288]
 
 
 class Toolbar(QToolBar):
+    def reset_toolbar_positions(self):
+        """Reset all toolbars to their default positions"""
+        main_window = self.parent()
+        
+        # First, remove all toolbars from the main window
+        main_window.removeToolBar(self)
+        main_window.removeToolBar(self.edit_toolbar)
+        main_window.removeToolBar(self.format_toolbar)
+        
+        # Then add them back in the default positions/areas
+        main_window.addToolBar(Qt.TopToolBarArea, self)
+        main_window.addToolBar(Qt.TopToolBarArea, self.edit_toolbar)
+        main_window.addToolBar(Qt.TopToolBarArea, self.format_toolbar)
+        
+        # Make sure they're visible
+        self.show()
+        self.edit_toolbar.show()
+        self.format_toolbar.show()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -298,7 +317,7 @@ class Toolbar(QToolBar):
             self.parent(),
         )
         reset_view_action.setStatusTip("Reset View")
-        reset_view_action.triggered.connect(self.parent().createDock)
+        reset_view_action.triggered.connect(lambda : (self.parent().createDock(), self.reset_toolbar_positions()))
         view_menu.addAction(reset_view_action)
 
     
