@@ -236,6 +236,7 @@ class MainWindow(QMainWindow):
                 f.write(text)
                 f.close()
                 self.changed = False
+                return 1
 
         except Exception as e:
             self.dialog_critical(str(e))
