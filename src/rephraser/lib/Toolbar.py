@@ -173,7 +173,8 @@ class Toolbar(QToolBar):
         # Connect to the signal producing the text of the current selection. Convert the string to float
         # and set as the pointsize. We could also use the index + retrieve from FONT_SIZES.
         self.parent().fontsize.currentIndexChanged[str].connect(
-            lambda s: self.parent().editor.setFontPointSize(float(s))
+            self.update_size
+            # lambda s: self.parent().editor.setFontPointSize(float(s))
         )
         self.format_toolbar.addWidget(self.parent().fontsize)
 
@@ -320,6 +321,85 @@ class Toolbar(QToolBar):
         reset_view_action.triggered.connect(lambda : (self.parent().createDock(), self.reset_toolbar_positions()))
         view_menu.addAction(reset_view_action)
 
+        self.parent().editor.cursorPositionChanged.connect(self.update_format)
+    
+    def update_size(self, s):
+        print("Update Size")
+        # Get the current cursor and format
+        cursor = self.parent().editor.textCursor()
+        charFormat = cursor.charFormat()
+        
+        # Set the new font size
+        charFormat.setFontPointSize(float(s))
+        
+        # Apply the format to the cursor
+        cursor.setCharFormat(charFormat)
+        
+        # Force cursor update by briefly hiding and showing
+        self.parent().editor.setCursorWidth(0)
+        QApplication.processEvents()
+        self.parent().editor.setCursorWidth(2)  # Or whatever your default cursor width is
+        
+        # Also update the document's default font size for empty documents
+        current_font = self.parent().editor.currentFont()
+        current_font.setPointSize(int(s))
+        self.parent().editor.document().setDefaultFont(current_font)
+        
+        # Update defaultCharFormat in TextEdit class
+        self.parent().editor.setFontPointSize(float(s))
+        
+        # Force update by triggering a refresh
+        self.parent().editor.setFocus()
+
+
+    def update_format(self):
+        """Update the formatting toolbar/actions when the cursor position changes"""
+        # Disable signals to avoid triggering format changes while updating UI
+        for action in self.parent()._format_actions:
+            if hasattr(action, 'blockSignals'):
+                action.blockSignals(True)
+        
+        # Get the current format at cursor position
+        cursor = self.parent().editor.textCursor()
+        char_format = cursor.charFormat()
+        
+        # Update font selector
+        current_font = char_format.font()
+        self.parent().fonts.setCurrentFont(current_font)
+        
+        # Update font size
+        font_size = char_format.fontPointSize()
+        if font_size > 0:  # fontPointSize returns 0 if not set
+            size_index = -1
+            for i, size in enumerate(FONT_SIZES):
+                if size == int(font_size):
+                    size_index = i
+                    break
+            if size_index >= 0:
+                self.parent().fontsize.setCurrentIndex(size_index)
+        
+        # Update bold button
+        self.parent().bold_action.setChecked(current_font.weight() >= QFont.Bold)
+        
+        # Update italic button
+        self.parent().italic_action.setChecked(current_font.italic())
+        
+        # Update underline button
+        self.parent().underline_action.setChecked(current_font.underline())
+        
+        # Update alignment buttons (paragraph-wide formatting)
+        block_format = cursor.blockFormat()
+        alignment = block_format.alignment()
+        
+        self.parent().alignl_action.setChecked(alignment == Qt.AlignLeft)
+        self.parent().alignc_action.setChecked(alignment == Qt.AlignCenter)
+        self.parent().alignr_action.setChecked(alignment == Qt.AlignRight)
+        self.parent().alignj_action.setChecked(alignment == Qt.AlignJustify)
+        
+        # Re-enable signals
+        for action in self.parent()._format_actions:
+            if hasattr(action, 'blockSignals'):
+                action.blockSignals(False)
     
     # Add this function to your Toolbar class
     def set_scaled_icons(self):
