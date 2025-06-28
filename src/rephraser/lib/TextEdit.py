@@ -143,7 +143,8 @@ class TextEdit(QTextEdit):
             if not selectedTextIsBeingDragged:
                 te = PasteFromAuthorDialog(parent=self)
                 te.author.connect(self.setTextCharFormat)
-                te.exec_()
+                if te.exec_() == QDialog.Rejected:
+                    self.textCharFormat = self.defaultCharFormat
 
                 self.setCharFormatSelection()
                 self.textCursor().insertText(source.text(), self.textCharFormat)
@@ -360,6 +361,7 @@ class TextEdit(QTextEdit):
             
             # Reset the cursor to maintain the selection
             self.setTextCursor(cursor)
+            self.setFocus()
             return  # Skip parent implementation if we handled it ourselves
         else:
             # For empty document or cursor without selection
@@ -376,3 +378,6 @@ class TextEdit(QTextEdit):
 
         # Call the parent implementation for non-selected text
         super().setCurrentFont(font)
+        self.setFocus()
+
+        

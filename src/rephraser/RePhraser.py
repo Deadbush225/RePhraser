@@ -190,6 +190,11 @@ class MainWindow(QMainWindow):
         dlg.show()
 
     def file_open(self, path=""):
+        if self.changed:
+            res = self.promptUnsavedChanges()
+            print(res)
+            if res != "Saved" and res != "Discard":
+                return
 
         print(path)
         # print(type(path))
@@ -217,6 +222,7 @@ class MainWindow(QMainWindow):
             # Qt will automatically try and guess the format as txt/html
 
             self.editor.setHtml(text)
+            self.changed = False
             # self.update_title()
             self.update_path(path)
 
@@ -293,10 +299,7 @@ class MainWindow(QMainWindow):
     def edit_toggle_wrap(self):
         self.editor.setLineWrapMode(1 if self.editor.lineWrapMode() == 0 else 0)
 
-    def closeEvent(self, e):
-        if not self.changed or self.editor.toPlainText() == "":
-            return
-        
+    def promptUnsavedChanges(self):
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Question)
         msg_box.setWindowTitle("Unsaved Changes")
@@ -316,12 +319,23 @@ class MainWindow(QMainWindow):
             res = QMessageBox.Cancel
 
         if res == QMessageBox.Save:
-            if not self.file_save():
-                e.ignore()
-                return
-        elif res == QMessageBox.Cancel:
-            e.ignore()
-            return
+            if self.file_save():
+                return "Saved"
             
-    
+        elif res == QMessageBox.Discard:
+            return "Discard"
+
+        # elif res == QMessageBox.Cancel:
+        return "Cancel"
+
+    def closeEvent(self, e):
+        if not self.changed or self.editor.toPlainText() == "":
+            return
+        
+        res = self.promptUnsavedChanges()
+
+        if res == "Saved" or res == "Discard":
+            return
+        elif res == "Cancel":
+            e.ignore()
 
