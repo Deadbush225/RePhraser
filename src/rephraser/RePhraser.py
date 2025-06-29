@@ -79,11 +79,13 @@ class MainWindow(QMainWindow):
 
         enable_dark_titlebar(self)
         
-        self.setMinimumSize(700, 400)
+        settings = QSettings("Deadbush225", "Rephrase")
 
+        self.setMinimumSize(700, 400)
         self.setWindowIcon(QIcon(os.path.join(basedir, "RePhraser.png")))
 
         self.path = None
+        self.folder = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
 
         self.layout = QVBoxLayout()
 
@@ -200,12 +202,15 @@ class MainWindow(QMainWindow):
         # print(type(path))
         if not path:
             print("FIND THE FILE")
+            
             path, _ = QFileDialog.getOpenFileName(
                 self,
                 "Open file",
-                "",
+                self.folder,
                 "HTML documents (*.html)",
             )
+            if not path:
+                return
 
         print(path)
         # print(type(path))
@@ -213,6 +218,8 @@ class MainWindow(QMainWindow):
         try:
             with open(path, "r") as f:
                 text = f.read()
+                f.close()
+                self.folder = os.path.dirname(path)
 
         except Exception as e:
             self.dialog_critical(str(e))
@@ -242,6 +249,7 @@ class MainWindow(QMainWindow):
                 f.write(text)
                 f.close()
                 self.changed = False
+                self.update_path(self.path)
                 return 1
 
         except Exception as e:
@@ -251,7 +259,7 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(
             self,
             "Save file",
-            "",
+            self.folder,
             "HTML documents (*.html)",
         )
 
@@ -270,13 +278,12 @@ class MainWindow(QMainWindow):
                 f.write(text)
                 f.close()
                 self.changed = False
+                self.update_path(path)
                 return 1
 
         except Exception as e:
             self.dialog_critical(str(e))
 
-        else:
-            self.update_path(path)
 
     def file_print(self):
         dlg = QPrintDialog()

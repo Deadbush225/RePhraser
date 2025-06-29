@@ -201,6 +201,7 @@ class TextEdit(QTextEdit):
         self.textCharFormat.setForeground(QColor(prop["foreground"]))
         self.textCharFormat.setBackground(QColor(prop["background"]))
         self.textCharFormat.setFontPointSize(self.fontPointSize())
+        self.textCharFormat.setFont(self.currentFont())
 
     def resizeEvent(self, e):
         # print(f"{self.document().idealWidth()} : {self.width()}")
