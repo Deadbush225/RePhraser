@@ -1,14 +1,20 @@
-# RePhraser — An anti-plagiarism text editor
+# RePhraser — A humanizer text editor
 
 The word processor for rephrasing your work from multiple sources
 
-The editor supports multiple fonts, styles and paragraph text alignment.
-There is also support for drag-drop of images, which are automatically
-opened and embedded.
+## Rationale
 
-Saves and opens HTML format documents.
+RePhraser helps you mark what you wrote and what you pasted from other resources like ChatGPT, Wikipedia, and even custom origins/authors.
 
-![Rephraser.png](./docs/RePhraser.png)
+## Features
+
+💬Multiple fonts
+📄Rich text editor
+🖼️Image support
+👆Drag-and-drop
+📂Saves and opens in HTML
+
+![Rephraser.png](./docs/demo.gif)
 
 ## Installation:
 
@@ -22,6 +28,7 @@ pip install git+https://github.com/Deadbush225/RePhrase
 ```
 
 ### Updates:
+
 ```
 pip install --upgrade git+https://github.com/Deadbush225/RePhrase
 ```
@@ -29,10 +36,11 @@ pip install --upgrade git+https://github.com/Deadbush225/RePhrase
 ## Usage:
 
 Go to any terminal and run:
+
 ```
 python -m rephraser
 ```
 
 ## Other licenses
 
-Icons used in the application are by [Yusuke Kamiyaman](http://p.yusukekamiyamane.com/).
+Icons used in the application are from [Yusuke Kamiyaman](http://p.yusukekamiyamane.com/).

@@ -6,6 +6,7 @@ from rephraser.lib.helper import *
 from rephraser.lib.Stores import store
 from rephraser.lib.qt_helper import HLine
 from rephraser.lib.Logger import Logger
+from rephraser.lib.DarkPallete import enable_dark_titlebar
 
 import math
 
@@ -142,12 +143,15 @@ class TextEdit(QTextEdit):
 
             if not selectedTextIsBeingDragged:
                 te = PasteFromAuthorDialog(parent=self)
+
+                enable_dark_titlebar(te)
                 te.author.connect(self.setTextCharFormat)
                 if te.exec_() == QDialog.Rejected:
                     self.textCharFormat = self.defaultCharFormat
 
                 self.setCharFormatSelection()
                 self.textCursor().insertText(source.text(), self.textCharFormat)
+                self.removeCharFormatSelection()
             elif selectedTextIsBeingDragged:
                 self.textCursor().insertHtml(source.html())
 
@@ -177,7 +181,9 @@ class TextEdit(QTextEdit):
 
     def keyPressEvent(self, e):
         if e.text().isalnum() or (e.text() == " "):
+            self.removeCharFormatSelection()
             Logger.w("ALPHANUMERIC", Logger.INFO)
+            self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
             # self.defaultCharFormat.setFontPointSize(self.fontPointSize())
             self.defaultCharFormat.setFont(self.currentFont())
             self.textCursor().insertText(e.text(), self.defaultCharFormat)
