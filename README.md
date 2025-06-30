@@ -24,13 +24,13 @@
   <a href="https://github.com/Deadbush225/RePhrase">
     <img src="./src/rephraser/Rephraser.png" alt="Logo" width="80" height="80">
   </a>
-
   <h3 style="font-size: 1.5em" align="center">RePhraser</h3>
 
   <p align="center">
     A humanizer text editor
     <br />
     The word processor for rephrasing your work from multiple sources
+    <br />
     <br />
     <a href="https://github.com/Deadbush225/RePhrase"><strong>Explore the docs »</strong></a>
     <br />
