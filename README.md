@@ -56,10 +56,7 @@ RePhraser helps you mark what you wrote and what you pasted from other resources
 
 ### Demo
 
-<video max- width="800" loop autoplay muted>
-    <source src="./docs/demo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+![Demo Video](./docs/demo.gif)
 
 ## Installation:
 
