@@ -8,11 +8,11 @@ RePhraser helps you mark what you wrote and what you pasted from other resources
 
 ## Features
 
-💬Multiple fonts
-📄Rich text editor
-🖼️Image support
-👆Drag-and-drop
-📂Saves and opens in HTML
+💬Multiple fonts <br>
+📄Rich text editor <br>
+🖼️Image support <br>
+👆Drag-and-drop <br>
+📂Saves and opens in HTML <br>
 
 ![Rephraser.png](./docs/demo.gif)
 
