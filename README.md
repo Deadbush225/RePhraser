@@ -45,7 +45,7 @@ RePhraser helps you mark what you wrote and what you pasted from other resources
 
 ### Demo
 
-<img src="./docs/demo.gif" style="max-width:600px"></img>
+<div align="center"><img src="./docs/demo.gif" width="650"></img></div>
 
 ## Installation:
 
