@@ -40,12 +40,14 @@ class Toolbar(QToolBar):
             self.parent(),
         )
         open_file_action.setStatusTip("Open file")
+        open_file_action.setShortcut(QKeySequence.Open)
         open_file_action.triggered.connect(self.parent().file_open)
         file_menu.addAction(open_file_action)
         self.addAction(open_file_action)
 
         save_file_action = QAction(QIcon(":/icons/disk.png"), "Save", self.parent())
         save_file_action.setStatusTip("Save current page")
+        save_file_action.setShortcut(QKeySequence.Save)
         save_file_action.triggered.connect(self.parent().file_save)
         file_menu.addAction(save_file_action)
         self.addAction(save_file_action)
@@ -55,8 +57,8 @@ class Toolbar(QToolBar):
             "Save As...",
             self.parent(),
         )
-        saveas_file_action.setShortcut(QKeySequence.Save)
         saveas_file_action.setStatusTip("Save current page to specified file")
+        saveas_file_action.setShortcut(QKeySequence.SaveAs)
         saveas_file_action.triggered.connect(self.parent().file_saveas)
         file_menu.addAction(saveas_file_action)
         self.addAction(saveas_file_action)
