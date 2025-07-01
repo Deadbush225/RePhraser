@@ -122,59 +122,13 @@ class MainWindow(QMainWindow):
         #     os.path.join(os.path.dirname(os.path.dirname(__file__)), "test.html")
         # )
 
-        # signals
-        self.editor.selectionChanged.connect(self.update_format)
-
-        
-
         # Initialize.
-        self.update_format()
         self.update_title()
         self.setMinimumSize(QSize(780, 510))
         self.show()
 
     def refresh_stylesheet(self):
         qApp.setStyleSheet("".join(open(os.path.join(basedir, "dark.qss")).readlines()))
-
-    def block_signals(self, objects, b):
-        for o in objects:
-            o.blockSignals(b)
-
-    def update_format(self):
-        """
-        Update the font format toolbar/actions when a new text selection is made. This is neccessary to keep
-        toolbars/etc. in sync with the current edit state.
-
-        > the current format in the toolbar doesn't represent the format of the selected text, but the format present in the cursor
-        """
-
-        # self.editor.textIsSelected = True
-
-        # print("selection changed")
-        # Disable signals for all format widgets, so changing values here does not trigger further formatting.
-        self.block_signals(self._format_actions, True)
-
-        # self.fonts.setCurrentFont(self.editor.currentFont())
-        # Nasty, but we get the font-size as a float but want it was an int
-
-        cursor = self.editor.textCursor()
-        # cursor.charFormat().fontPointSize()
-        charFormat = cursor.charFormat()
-        blockFormat = cursor.blockFormat()
-
-        # todo: we don't need to update Font settings since we always override the inserted text with the default TextFormat
-        # self.fontsize.setCurrentText(str(int(charFormat.fontPointSize())))
-
-        # self.italic_action.setChecked(charFormat.fontItalic())
-        # self.underline_action.setChecked(charFormat.fontUnderline())
-        # self.bold_action.setChecked(charFormat.fontWeight() == 100)
-
-        self.alignl_action.setChecked(blockFormat.alignment() == Qt.AlignLeft)
-        self.alignc_action.setChecked(blockFormat.alignment() == Qt.AlignCenter)
-        self.alignr_action.setChecked(blockFormat.alignment() == Qt.AlignRight)
-        self.alignj_action.setChecked(blockFormat.alignment() == Qt.AlignJustify)
-
-        self.block_signals(self._format_actions, False)
 
     def open_directory(self):
         self.layout.setCurrentWidget(self.editor)

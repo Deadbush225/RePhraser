@@ -352,12 +352,15 @@ class Toolbar(QToolBar):
         self.parent().editor.setFocus()
 
 
+    def block_signals(self, objects, b):
+        for o in objects:
+            if hasattr(o, 'blockSignals'):
+                o.blockSignals(b)
+
     def update_format(self):
         """Update the formatting toolbar/actions when the cursor position changes"""
         # Disable signals to avoid triggering format changes while updating UI
-        for action in self.parent()._format_actions:
-            if hasattr(action, 'blockSignals'):
-                action.blockSignals(True)
+        self.block_signals(self.parent()._format_actions, True)
         
         # Get the current format at cursor position
         cursor = self.parent().editor.textCursor()
@@ -397,9 +400,7 @@ class Toolbar(QToolBar):
         self.parent().alignj_action.setChecked(alignment == Qt.AlignJustify)
         
         # Re-enable signals
-        for action in self.parent()._format_actions:
-            if hasattr(action, 'blockSignals'):
-                action.blockSignals(False)
+        self.block_signals(self.parent()._format_actions, False)
     
     # Add this function to your Toolbar class
     def set_scaled_icons(self):
