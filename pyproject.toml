@@ -9,7 +9,7 @@ description = "Rephrase essays and collage texts"
 readme = "README.md"
 authors = [{ name = "EliazarInso", email = "deadbush225@gmail.com" }]
 license = { file = "LICENSE.txt" }
-lassifiers = [
+classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
     "Programming Language :: Python :: 3",
