@@ -182,15 +182,15 @@ class TextEdit(QTextEdit):
         super().insertFromMimeData(source)
 
     def keyPressEvent(self, e):
-        # if e.text().isalnum() or (e.text() == " "):
-        #     # self.removeCharFormatSelection()
-        #     Logger.w("ALPHANUMERIC", Logger.INFO)
-        #     self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
-        #     # self.defaultCharFormat.setFontPointSize(self.fontPointSize())
-        #     self.defaultCharFormat.setFont(self.currentFont())
-        #     self.textCursor().insertText(e.text(), self.defaultCharFormat)
-        #     # self.parent_.update_format()
-        #     return
+        if e.text().isalnum() or (e.text() == " "):
+            # self.removeCharFormatSelection()
+            Logger.w("ALPHANUMERIC", Logger.INFO)
+            self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
+            self.defaultCharFormat.setFontPointSize(self.fontPointSize())
+            self.defaultCharFormat.setFont(self.currentFont())
+            self.textCursor().insertText(e.text(), self.defaultCharFormat)
+            # self.parent_.update_format()
+            return
 
         super().keyPressEvent(e)
 
