@@ -4,27 +4,21 @@ from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
 
 import os
-import sys
-import uuid
 import math
-import re
-import traceback
 
 from rephraser.lib.AuthorTable import AuthorTable
 from rephraser.lib.ScrollBar import ScrollBar
-from rephraser.lib.TextEdit import TextEdit, PasteFromAuthorDialog
+from rephraser.lib.TextEdit import TextEdit
 from rephraser.lib.helper import *
 from rephraser.lib.Toolbar import Toolbar
-from rephraser.lib.DarkPallete import DarkPalette
+from rephraser.lib.DarkPallete import enable_dark_titlebar
 from rephraser.lib.Logger import Logger
 
 from rephraser import basedir
 import rephraser.images.images # Resource file for the icons
-from rephraser.lib.DarkPallete import enable_dark_titlebar
 
 floor = math.floor
 
-IMAGE_EXTENSIONS = [".jpg", ".png", ".bmp"]
 HTML_EXTENSIONS = [".htm", ".html"]
 
 class MainWindow(QMainWindow):
@@ -123,7 +117,7 @@ class MainWindow(QMainWindow):
         # We need to repeat the size to init the current format.
         self.editor.setFontPointSize(12)
 
-        # ━━━━━━━━━━━━━━━━━━━━━━━ Initialize Contents ━━━━━━━━━━━━━━━━━━━━━━━ #
+        # ━━━━━━━━━━━━━━━━━━ Initialize Contents ━━━━━━━━━━━━━━━━━━ #
         # self.file_open(
         #     os.path.join(os.path.dirname(os.path.dirname(__file__)), "test.html")
         # )

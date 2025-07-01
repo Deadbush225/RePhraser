@@ -10,6 +10,8 @@ from rephraser.lib.DarkPallete import enable_dark_titlebar
 
 import math
 
+IMAGE_EXTENSIONS = [".jpg", ".png", ".bmp"]
+
 class PasteFromAuthorDialog(QDialog):
 
     author = pyqtSignal(str)
