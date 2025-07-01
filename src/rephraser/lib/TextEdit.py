@@ -119,6 +119,7 @@ class TextEdit(QTextEdit):
             print("I CAN INSERT IMAGE")
             print(self.parent_.path)
             if self.parent_.path is None:
+                QMessageBox.information(self, "Save Required", "Please save the file before inserting images.")
                 self.parent_.file_save()
 
             # recheck after displaying save dialog
