@@ -5,6 +5,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
+
 <!-- [![LinkedIn][linkedin-shield]][linkedin-url] -->
 
 <br />
@@ -44,7 +45,7 @@ RePhraser helps you mark what you wrote and what you pasted from other resources
 
 ### Demo
 
-![Demo Video](./docs/demo.gif)
+<img src="./docs/demo.gif" style="max-width:600px"></img>
 
 ## Installation:
 
