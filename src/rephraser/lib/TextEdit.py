@@ -180,15 +180,15 @@ class TextEdit(QTextEdit):
         super().insertFromMimeData(source)
 
     def keyPressEvent(self, e):
-        if e.text().isalnum() or (e.text() == " "):
-            self.removeCharFormatSelection()
-            Logger.w("ALPHANUMERIC", Logger.INFO)
-            self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
-            # self.defaultCharFormat.setFontPointSize(self.fontPointSize())
-            self.defaultCharFormat.setFont(self.currentFont())
-            self.textCursor().insertText(e.text(), self.defaultCharFormat)
-            # self.parent_.update_format()
-            return
+        # if e.text().isalnum() or (e.text() == " "):
+        #     # self.removeCharFormatSelection()
+        #     Logger.w("ALPHANUMERIC", Logger.INFO)
+        #     self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
+        #     # self.defaultCharFormat.setFontPointSize(self.fontPointSize())
+        #     self.defaultCharFormat.setFont(self.currentFont())
+        #     self.textCursor().insertText(e.text(), self.defaultCharFormat)
+        #     # self.parent_.update_format()
+        #     return
 
         super().keyPressEvent(e)
 
@@ -334,57 +334,42 @@ class TextEdit(QTextEdit):
         return image_name
         # return uuid
 
-    def setCurrentFont(self, font):
-        print("Setting Current Font")
-        # First update the default format
+    def setCurrentFont(self, font: QFont):
+        print(f"Setting Current Font: {font.family()}")
+        # Update the default format with the new font
         self.defaultCharFormat.setFont(font)
         
-        # If text is selected, apply format to selection
+        # Get current cursor
         cursor = self.textCursor()
+        
+        # Create a format with all font properties
+        char_fmt = QTextCharFormat()
+        char_fmt.setFont(font)
+        
         if cursor.hasSelection():
-            # Create a complete format for the selection
-            fmt = QTextCharFormat()
-            fmt.setFont(font)
-            
-            # Remember the original positions
-            start = cursor.selectionStart()
-            end = cursor.selectionEnd()
-            
-            # Apply the format while preserving font size
+            # If text is selected, apply format to selection
             cursor.beginEditBlock()
-            cursor.setPosition(start)
-            cursor.setPosition(end, QTextCursor.KeepAnchor)
-            # Iterate over the selection and update only the font family
-            temp_cursor = QTextCursor(cursor)
-            pos = start
-            while pos < end:
-                temp_cursor.setPosition(pos)
-                temp_cursor.movePosition(QTextCursor.NextCharacter, QTextCursor.KeepAnchor)
-                char_fmt = temp_cursor.charFormat()
-                char_fmt.setFontFamily(font.family())
-                temp_cursor.setCharFormat(char_fmt)
-                pos += 1
+            cursor.mergeCharFormat(char_fmt)
             cursor.endEditBlock()
-            
-            # Reset the cursor to maintain the selection
             self.setTextCursor(cursor)
-            self.setFocus()
-            return  # Skip parent implementation if we handled it ourselves
         else:
-            # For empty document or cursor without selection
-            # Update the text cursor's character format
-            fmt = QTextCharFormat()
-            fmt.setFont(font)
-            cursor.setCharFormat(fmt)
+            # For cursor without selection, set format for future typing
+            cursor.setCharFormat(char_fmt)
+            self.setTextCursor(cursor)
             
-            # Also set the document's default font
-            doc = self.document()
-            doc_fmt = doc.defaultTextOption()
-            new_doc_fmt = QTextOption(doc_fmt)
+            # Also update document default font for consistency
             self.document().setDefaultFont(font)
-
-        # Call the parent implementation for non-selected text
+        
+        # Call parent implementation for proper handling
         super().setCurrentFont(font)
         self.setFocus()
+        #     doc = self.document()
+        #     doc_fmt = doc.defaultTextOption()
+        #     new_doc_fmt = QTextOption(doc_fmt)
+        #     self.document().setDefaultFont(font)
+
+        # # Call the parent implementation for non-selected text
+        # super().setCurrentFont(font)
+        # self.setFocus()
 
         
