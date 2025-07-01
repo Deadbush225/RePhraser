@@ -1,22 +1,10 @@
 <a id="readme-top"></a>
 
-<div align="center">
-<a href="https://github.com/Deadbush225/RePhrase/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/Deadbush225/RePhrase?style=for-the-badge" alt="Contributors">
-</a>
-<a href="https://github.com/Deadbush225/RePhrase/forks">
-    <img src="https://img.shields.io/github/forks/Deadbush225/RePhrase?style=for-the-badge" alt="Forks">
-</a>
-<a href="https://github.com/Deadbush225/RePhrase/stargazers">
-    <img src="https://img.shields.io/github/stars/Deadbush225/RePhrase?style=for-the-badge" alt="Stargazers">
-</a>
-<a href="https://github.com/Deadbush225/RePhrase/issues">
-    <img src="https://img.shields.io/github/issues/Deadbush225/RePhrase?style=for-the-badge" alt="Issues">
-</a>
-<a href="https://github.com/Deadbush225/RePhrase/blob/master/LICENSE.txt">
-    <img src="https://img.shields.io/github/license/Deadbush225/RePhrase?style=for-the-badge" alt="License">
-</a>
-</div>
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![License][license-shield]][license-url]
 <!-- [![LinkedIn][linkedin-shield]][linkedin-url] -->
 
 <br />
