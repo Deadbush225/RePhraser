@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
     "Operating System :: OS Independent",
     "Topic :: Text Editors",
     "Topic :: Text Processing",
@@ -40,10 +40,10 @@ rephraser = "rephraser.__main__:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-rephraser = ["*.png", "*.qss", "images/*"]
+rephraser = ["*.ico", "*.png", "*.qss", "images/*"]

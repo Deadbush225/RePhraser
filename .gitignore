@@ -5,3 +5,5 @@ test/
 build/
 dist/
 logs/
+
+src/*.egg-info
