@@ -37,9 +37,9 @@ class ClickableLabel(QLabel):
         self.redrawLabel()
 
     def redrawLabel(self):
+
         self.setStyleSheet(
-            "QLabel"
-            "{"
+            "QLabel {"
             f"background-color : {self.color.name()};"
             "border : 1px solid black;"
             "}"
