@@ -21,7 +21,6 @@ class Logger:
             cls.cleanup_old_logs()
             now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
             logs_dir = project_dir / "logs"
-            print(logs_dir)
             logs_dir.mkdir(parents=True, exist_ok=True)
             cls._file = open(logs_dir / f"{now}.txt", "x")
             cls._initialized = True

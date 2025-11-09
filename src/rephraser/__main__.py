@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     app.setStyleSheet("".join(open(basedir / "dark.qss").readlines()))
     ico = basedir / "Rephraser.ico"
-    print(ico)
     app.setWindowIcon(QIcon(str(ico)))
 
     # window = PasteFromAuthorDialog()
