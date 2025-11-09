@@ -12,9 +12,10 @@ import math
 
 IMAGE_EXTENSIONS = [".jpg", ".png", ".bmp"]
 
+
 class PasteFromAuthorDialog(QDialog):
 
-    author = pyqtSignal(str)
+    author_selected = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -56,7 +57,7 @@ class PasteFromAuthorDialog(QDialog):
 
     def fin(self):
         self.done(QDialog.Accepted)
-        self.author.emit(self.author_cmbx.currentText())
+        self.author_selected.emit(self.author_cmbx.currentText())
 
 
 class TextEdit(QTextEdit):
@@ -72,8 +73,7 @@ class TextEdit(QTextEdit):
         self.dropped_text = None
 
         self.textCharFormat = QTextCharFormat()
-
-        self.defaultCharFormat = QTextCharFormat()
+        self.defaultCharFormat = QTextCharFormat()  # reset format
         font = QFont("Lexend", 12)
         self.defaultCharFormat.setFont(font)
 
@@ -119,7 +119,11 @@ class TextEdit(QTextEdit):
             print("I CAN INSERT IMAGE")
             print(self.parent_.path)
             if self.parent_.path is None:
-                QMessageBox.information(self, "Save Required", "Please save the file before inserting images.")
+                QMessageBox.information(
+                    self,
+                    "Save Required",
+                    "Please save the file before inserting images.",
+                )
                 self.parent_.file_save()
 
             # recheck after displaying save dialog
@@ -148,7 +152,7 @@ class TextEdit(QTextEdit):
                 te = PasteFromAuthorDialog(parent=self)
 
                 enable_dark_titlebar(te)
-                te.author.connect(self.setTextCharFormat)
+                te.author_selected.connect(self.setTextCharFormat)
                 if te.exec_() == QDialog.Rejected:
                     self.textCharFormat = self.defaultCharFormat
 
@@ -341,14 +345,14 @@ class TextEdit(QTextEdit):
         print(f"Setting Current Font: {font.family()}")
         # Update the default format with the new font
         self.defaultCharFormat.setFont(font)
-        
+
         # Get current cursor
         cursor = self.textCursor()
-        
+
         # Create a format with all font properties
         char_fmt = QTextCharFormat()
         char_fmt.setFont(font)
-        
+
         if cursor.hasSelection():
             # If text is selected, apply format to selection
             cursor.beginEditBlock()
@@ -359,10 +363,10 @@ class TextEdit(QTextEdit):
             # For cursor without selection, set format for future typing
             cursor.setCharFormat(char_fmt)
             self.setTextCursor(cursor)
-            
+
             # Also update document default font for consistency
             self.document().setDefaultFont(font)
-        
+
         # Call parent implementation for proper handling
         super().setCurrentFont(font)
         self.setFocus()
@@ -374,5 +378,3 @@ class TextEdit(QTextEdit):
         # # Call the parent implementation for non-selected text
         # super().setCurrentFont(font)
         # self.setFocus()
-
-        

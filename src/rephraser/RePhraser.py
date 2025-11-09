@@ -15,11 +15,13 @@ from rephraser.lib.DarkPallete import enable_dark_titlebar
 from rephraser.lib.Logger import Logger
 
 from rephraser import basedir
-import rephraser.images.images # Resource file for the icons
+import rephraser.images.images  # Resource file for the icons
+from pathlib import Path
 
 floor = math.floor
 
 HTML_EXTENSIONS = [".htm", ".html"]
+
 
 class MainWindow(QMainWindow):
     changed = False
@@ -59,9 +61,9 @@ class MainWindow(QMainWindow):
         self.refresh_btn = QPushButton("Refresh stylesheet")
         self.refresh_btn.clicked.connect(self.refresh_stylesheet)
         dock_layout.addWidget(self.refresh_btn)
-        
+
         self.dockwidget.closeEvent = lambda event: self.on_dock_close(event)
-    
+
     def on_dock_close(self, event):
         self.removeDockWidget(self.dockwidget)
         self.dockwidget.deleteLater()
@@ -72,7 +74,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         enable_dark_titlebar(self)
-        
+
         settings = QSettings("Deadbush225", "Rephrase")
 
         self.setMinimumSize(700, 400)
@@ -86,7 +88,7 @@ class MainWindow(QMainWindow):
         self.editor = TextEdit(parent=self)
         self.editor.setVerticalScrollBar(ScrollBar(Qt.Vertical))
         self.editor.setTabStopDistance(40)
-        self.editor.textChanged.connect(lambda: setattr(self, 'changed', True))
+        self.editor.textChanged.connect(lambda: setattr(self, "changed", True))
 
         # Setup the QTextEdit editor configuration
         # self.editor.setAutoFormatting(QTextEdit.AutoAll)
@@ -150,7 +152,7 @@ class MainWindow(QMainWindow):
         # print(type(path))
         if not path:
             print("FIND THE FILE")
-            
+
             path, _ = QFileDialog.getOpenFileName(
                 self,
                 "Open file",
@@ -204,7 +206,7 @@ class MainWindow(QMainWindow):
             self.dialog_critical(str(e))
 
     def file_saveas(self):
-        path, _ = QFileDialog.getSaveFileName(
+        path, filter_ = QFileDialog.getSaveFileName(
             self,
             "Save file",
             self.folder,
@@ -214,6 +216,8 @@ class MainWindow(QMainWindow):
         if not path:
             # If dialog is cancelled, will return ''
             return 0
+        if Path(path).suffix == "":
+            path += ".html"
 
         text = (
             self.editor.toHtml()
@@ -231,7 +235,6 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             self.dialog_critical(str(e))
-
 
     def file_print(self):
         dlg = QPrintDialog()
@@ -276,7 +279,7 @@ class MainWindow(QMainWindow):
         if res == QMessageBox.Save:
             if self.file_save():
                 return "Saved"
-            
+
         elif res == QMessageBox.Discard:
             return "Discard"
 
@@ -286,11 +289,10 @@ class MainWindow(QMainWindow):
     def closeEvent(self, e):
         if not self.changed or self.editor.toPlainText() == "":
             return
-        
+
         res = self.promptUnsavedChanges()
 
         if res == "Saved" or res == "Discard":
             return
         elif res == "Cancel":
             e.ignore()
-
