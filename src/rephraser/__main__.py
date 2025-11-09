@@ -8,6 +8,7 @@ import sys
 import os
 
 from rephraser import basedir
+from PyQt5.QtGui import QIcon
 
 if __name__ == "__main__":
 
@@ -26,11 +27,14 @@ if __name__ == "__main__":
     #     custom_colors={"primary": "#D0BCFF", "background": "24273a", "statusBar.background": "24273a", "toolbar.background": "24273a", "background>title": "c5c2c5", "foreground": "c5cff5", "border": "#39394a"})
     # qdarktheme.stop_sync()
 
-    app.setStyleSheet("".join(open(os.path.join(basedir, "dark.qss")).readlines()))
-    # app.setWindowIcon(QIcon(os.path.join(basedir, "RePhraser.ico")))
+    app.setStyleSheet("".join(open(basedir / "dark.qss").readlines()))
+    ico = basedir / "Rephraser.ico"
+    print(ico)
+    app.setWindowIcon(QIcon(str(ico)))
 
     # window = PasteFromAuthorDialog()
     window = MainWindow()
+    window.setWindowIcon(QIcon(str(ico)))
     # window = QMainWindow()
     # lbl = QLabel("Test")
     # window.setCentralWidget(lbl)
