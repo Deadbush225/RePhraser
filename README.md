@@ -16,8 +16,6 @@
   <h3 style="font-size: 1.5em" align="center">RePhraser</h3>
 
   <p align="center">
-    A humanizer text editor
-    <br />
     The word processor for rephrasing your work from multiple sources
     <br />
     <br />
@@ -33,7 +31,7 @@
 
 ## About The Project
 
-RePhraser helps you mark what you wrote and what you pasted from other resources like ChatGPT, Wikipedia, and even custom origins/authors.
+RePhraser helps you keep track of what you wrote and what you pasted from other resources like ChatGPT, Wikipedia, and even custom origins/authors.
 
 ### Features
 
@@ -54,7 +52,7 @@ RePhraser helps you mark what you wrote and what you pasted from other resources
 - [x] python 3.9 or later
 - [x] PyQt5 5.15.10 or later
 
-### Installation:
+> Recommended: create a virtual environment first
 
 ```
 pip install git+https://github.com/Deadbush225/RePhrase
