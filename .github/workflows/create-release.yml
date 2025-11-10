@@ -1,0 +1,28 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub CLI
+        uses: cli/gh-action@v2
+
+      - name: Authenticate gh CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh auth login --with-token
+
+      - name: Setup PowerShell
+        uses: actions/setup-powershell@v2
+
+      - name: Run eRelease.ps1 (non-interactive)
+        # Override Read-Host to auto-confirm, then dot-source the script from workspace
+        run: . '${{ github.workspace }}/scripts/eRelease/eRelease.ps1' -noInteractive
