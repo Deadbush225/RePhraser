@@ -11,18 +11,40 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup GitHub CLI
-        uses: cli/gh-action@v2
-
-      - name: Authenticate gh CLI
+        with:
+          # ensure submodules (like scripts/eRelease) are cloned
+          submodules: "recursive"
+          # fetch full history (optional but helpful if scripts rely on tags/ancillary refs)
+          fetch-depth: 0
+      - name: List workspace
+        shell: pwsh
+        run: |
+          Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+          Write-Host "Top-level files and directories recursive:"
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Force -Recurse | ForEach-Object { Write-Host $_.FullName }
+      - name: Generate release notes
+        id: gen_notes
+        # run PowerShell to invoke the generate-release-notes function and return the path
+        shell: pwsh
+        run: |
+          # import the module that defines Write-ReleaseNotes
+          . "${{ github.workspace }}/scripts/eRelease/Write-ReleaseNotes.ps1"
+          # Write-ReleaseNotes returns two values: the notes file path and a hashtable of variables
+          # capture both so we only publish the file path as the step output (previously the hashtable
+          # was stringified and appended, producing an invalid path).
+          $notesFile, $variableMap = Write-ReleaseNotes
+          Write-Host "Wrote release notes to: $notesFile"
+          # expose the path as a step output (ensure it contains only the path)
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "notes_file=$notesFile"
+          # print the notes file path to the step log
+          Write-Host "notes_file=$notesFile"
+      - name: Create GitHub Release (Actions)
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          body_path: ${{ steps.gen_notes.outputs.notes_file }}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh auth login --with-token
-
-      - name: Setup PowerShell
-        uses: actions/setup-powershell@v2
-
-      - name: Run eRelease.ps1 (non-interactive)
-        # Override Read-Host to auto-confirm, then dot-source the script from workspace
-        run: . '${{ github.workspace }}/scripts/eRelease/eRelease.ps1' -noInteractive
