@@ -51,12 +51,12 @@ class AddAuthorDialog(QDialog):
 
         foreground_cont = QHBoxLayout()
         foreground_cont.addWidget(QLabel("Foreground: "))
-        self.colorPrev_foreground = ClickableLabel(foreground)
+        self.colorPrev_foreground = ClickableLabel(QColor(foreground))
         foreground_cont.addWidget(self.colorPrev_foreground)
 
         background_cont = QHBoxLayout()
         background_cont.addWidget(QLabel("Background: "))
-        self.colorPrev_background = ClickableLabel(background)
+        self.colorPrev_background = ClickableLabel(QColor(background))
         background_cont.addWidget(self.colorPrev_background)
 
         weight_cont = QHBoxLayout()
