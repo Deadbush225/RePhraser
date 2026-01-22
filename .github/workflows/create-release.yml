@@ -8,6 +8,8 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to delete/create releases
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -16,6 +18,14 @@ jobs:
           submodules: "recursive"
           # fetch full history (optional but helpful if scripts rely on tags/ancillary refs)
           fetch-depth: 0
+
+      - name: Remove existing release if it exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The '|| true' ensures the step doesn't fail if the release doesn't exist yet.
+          gh release delete ${{ github.ref_name }} --yes || echo "No existing release found for ${{ github.ref_name }}"
+
       - name: List workspace
         shell: pwsh
         run: |
@@ -29,22 +39,19 @@ jobs:
         run: |
           # import the module that defines Write-ReleaseNotes
           . "${{ github.workspace }}/scripts/eRelease/Write-ReleaseNotes.ps1"
-          # Write-ReleaseNotes returns two values: the notes file path and a hashtable of variables
-          # capture both so we only publish the file path as the step output (previously the hashtable
-          # was stringified and appended, producing an invalid path).
-          $notesFile, $variableMap = Write-ReleaseNotes
+          $notesFile, $variableMap, $notesDir = Write-ReleaseNotes
           Write-Host "Wrote release notes to: $notesFile"
           # expose the path as a step output (ensure it contains only the path)
           Add-Content -Path $env:GITHUB_OUTPUT -Value "notes_file=$notesFile"
           # print the notes file path to the step log
           Write-Host "notes_file=$notesFile"
-      - name: Create GitHub Release (Actions)
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ github.ref_name }}
-          body_path: ${{ steps.gen_notes.outputs.notes_file }}
-          draft: false
-          prerelease: false
+          
+      - name: Create GitHub Release (CLI)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "${{ github.ref_name }}" \
+            --notes-file "${{ steps.gen_notes.outputs.notes_file }}" \
+            --draft=false \
+            --prerelease=false
