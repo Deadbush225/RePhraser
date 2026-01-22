@@ -67,6 +67,9 @@ class TextEdit(QTextEdit):
         self.parent_ = parent
 
         self.setMinimumWidth(580)
+        
+        # Make the caret thicker
+        self.setCursorWidth(3)
 
         self.parent_ = parent
         self.textIsSelected = False
@@ -209,12 +212,34 @@ class TextEdit(QTextEdit):
         prop = store.author_dictionary[authorName]
         Logger.w(prop, Logger.INFO)
 
+        # Create a new format based on current font to preserve font family and size
+        self.textCharFormat = QTextCharFormat()
+        self.textCharFormat.setFont(self.currentFont())
+        self.textCharFormat.setFontPointSize(self.fontPointSize())
+        
+        # Apply italic formatting
         self.textCharFormat.setFontItalic(prop["italic"])
-        self.textCharFormat.setFontWeight(prop["weight"])
+        
+        # Convert weight to Qt font weight system
+        # Qt uses: Light=25, Normal=50, DemiBold=63, Bold=75, Black=87
+        # Convert from 0-100 scale to Qt scale
+        weight_value = prop["weight"]
+        if weight_value >= 90:
+            qt_weight = QFont.Black  # 87
+        elif weight_value >= 70:
+            qt_weight = QFont.Bold  # 75
+        elif weight_value >= 55:
+            qt_weight = QFont.DemiBold  # 63
+        elif weight_value >= 35:
+            qt_weight = QFont.Normal  # 50
+        else:
+            qt_weight = QFont.Light  # 25
+        
+        self.textCharFormat.setFontWeight(qt_weight)
+        
+        # Apply colors
         self.textCharFormat.setForeground(QColor(prop["foreground"]))
         self.textCharFormat.setBackground(QColor(prop["background"]))
-        self.textCharFormat.setFontPointSize(self.fontPointSize())
-        self.textCharFormat.setFont(self.currentFont())
 
     def resizeEvent(self, e):
         # print(f"{self.document().idealWidth()} : {self.width()}")

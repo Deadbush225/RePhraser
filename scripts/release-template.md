@@ -5,14 +5,6 @@
 
 **Full Changelog**: https://github.com/${REPO}/commits/${TAG}
 
-## Highlights
-
-- First stable release
-
-## New Features
-
-## Improvements
-
 ## Bug Fixes
-
-## Contributors
+ - Font weight and italic is not set properly
+ - Improve GUI control

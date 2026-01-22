@@ -129,8 +129,8 @@ class AuthorTable(QTableWidget):
         store.author_dictionary = self.settings.value("authors")
         # print(retrieved)
 
-        self.setColumnCount(2)
-        self.setHorizontalHeaderLabels(["Author", "Signature"])
+        self.setColumnCount(1)
+        self.setHorizontalHeaderLabels(["Author Signature"])
         self.verticalHeader().hide()
         # store.author_dictionary = author_dictionary
 
@@ -181,7 +181,7 @@ class AuthorTable(QTableWidget):
 
         self.cellDoubleClicked.connect(
             lambda row, col: self.addAuthor(
-                author_name=self.item(row, 0).text(), row_count=row
+                author_name=self.cellWidget(row, 0).text(), row_count=row
             )
         )
 
@@ -222,7 +222,7 @@ class AuthorTable(QTableWidget):
 
             # row is defined which means it is overriden
             # replace old name with new
-            old_name = self.item(self.selectedRows()[0], 0).text()
+            old_name = self.cellWidget(self.selectedRows()[0], 0).text()
             # store.author_dictionary = {
             #     (key if key != old_name else author_name): value
             #     for (key, value) in store.author_dictionary.items()
@@ -235,15 +235,16 @@ class AuthorTable(QTableWidget):
         textCell = QTableWidgetItem(entry.author_name)
         textCell.setFlags(Qt.ItemIsSelectable)
 
-        self.setItem(row_count, 0, textCell)
+        # self.setItem(row_count, 0, textCell)
 
-        signature_preview = QLabel("Text")
+        signature_preview = QLabel(entry.author_name)
+        signature_preview.setAlignment(Qt.AlignCenter)
         signature_preview.setStyleSheet(entry.getStyleSheet())
 
-        self.setCellWidget(row_count, 1, signature_preview)
+        self.setCellWidget(row_count, 0, signature_preview)
 
     def table_selection_changed(self, row, col):
-        print("SELECTION CHANGED")
+        print(f"SELECTION CHANGED {row}")
         # selected_rows = {r.row() for r in self.selectedIndexes()}
 
         # if len(selected_rows) != 1:
@@ -253,7 +254,7 @@ class AuthorTable(QTableWidget):
         # selected_row = list(selected_rows)[0]
         selected_row = row
 
-        author_name = self.item(selected_row, 0).text()
+        author_name = self.cellWidget(selected_row, 0).text()
 
         self.parent_.editor.setTextCharFormat(author_name)
         self.parent_.editor.setCharFormatSelection()
