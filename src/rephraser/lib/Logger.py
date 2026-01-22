@@ -36,7 +36,7 @@ class Logger:
                 pass
 
     @classmethod
-    def w(cls, message, level):
+    def w(cls, message, level=DEBUG):
         if not cls._initialized:
             cls._init()
         cls._file.write(f"[{datetime.now().strftime('%H:%M:%S')}][{level}] {message}\n")

@@ -58,9 +58,10 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
 
         # ━━━━━━━━━━━━━━━━━━━ Refresh Stylesheet ━━━━━━━━━━━━━━━━━━ #
-        self.refresh_btn = QPushButton("Refresh stylesheet")
-        self.refresh_btn.clicked.connect(self.refresh_stylesheet)
-        dock_layout.addWidget(self.refresh_btn)
+        if os.getenv("REPHRASER_DEBUG") == "1":
+          self.refresh_btn = QPushButton("Refresh stylesheet")
+          self.refresh_btn.clicked.connect(self.refresh_stylesheet)
+          dock_layout.addWidget(self.refresh_btn)
 
         self.dockwidget.closeEvent = lambda event: self.on_dock_close(event)
 

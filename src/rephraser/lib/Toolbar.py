@@ -159,7 +159,7 @@ class Toolbar(QToolBar):
         # We need references to these actions/settings to update as selection changes, so attach to self.parent().
         self.parent().fonts = QFontComboBox()
         self.parent().fonts.currentFontChanged.connect(
-            self.parent().editor.setCurrentFont
+            self.update_fontFamily
         )
         font = QFont("Lexend", 12)
         self.parent().fonts.setCurrentFont(font)
@@ -327,9 +327,16 @@ class Toolbar(QToolBar):
 
         self.parent().editor.cursorPositionChanged.connect(self.update_format)
 
+    def update_fontFamily(self, font: QFont):
+        self.parent().editor.setFontFamily(font.family())
+        self.parent().editor.defaultCharFormat.setFontFamily(font.family())
+
     def update_size(self, s: float):
         editor = self.parent().editor
         sizef = float(s)
+
+        # Update the to be used for the central default format
+        editor.defaultCharFormat.setFontPointSize(sizef)
 
         # Save current cursor/selection to restore later
         cur = editor.textCursor()

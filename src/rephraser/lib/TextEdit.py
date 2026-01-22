@@ -191,24 +191,23 @@ class TextEdit(QTextEdit):
 
     def keyPressEvent(self, e):
         if e.text().isalnum() or (e.text() == " "):
+            self.defaultCharFormat.setFontWeight(QFont.Normal)
+            self.defaultCharFormat.setFontItalic(False)
             # self.removeCharFormatSelection()
-            Logger.w("ALPHANUMERIC", Logger.INFO)
             self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
-            self.defaultCharFormat.setFontPointSize(self.fontPointSize())
-            self.defaultCharFormat.setFont(self.currentFont())
+
             self.textCursor().insertText(e.text(), self.defaultCharFormat)
-            # self.parent_.update_format()
             return
 
         super().keyPressEvent(e)
-
-    def setCharFormatSelection(self):
-        self.textCursor().setCharFormat(self.textCharFormat)
 
     def removeCharFormatSelection(self):
         self.textCursor().setCharFormat(self.defaultCharFormat)
 
     def setTextCharFormat(self, authorName):
+        self.defaultCharFormat.setFontItalic(self.fontItalic())
+        self.defaultCharFormat.setFontWeight(self.fontWeight())
+
         prop = store.author_dictionary[authorName]
         Logger.w(prop, Logger.INFO)
 
@@ -240,6 +239,8 @@ class TextEdit(QTextEdit):
         # Apply colors
         self.textCharFormat.setForeground(QColor(prop["foreground"]))
         self.textCharFormat.setBackground(QColor(prop["background"]))
+
+        self.textCursor().setCharFormat(self.textCharFormat)
 
     def resizeEvent(self, e):
         # print(f"{self.document().idealWidth()} : {self.width()}")
@@ -367,7 +368,7 @@ class TextEdit(QTextEdit):
         # return uuid
 
     def setCurrentFont(self, font: QFont):
-        print(f"Setting Current Font: {font.family()}")
+        Logger.w(f"Setting Current Font: {font.family()}", Logger.INFO)
         # Update the default format with the new font
         self.defaultCharFormat.setFont(font)
 
