@@ -10,14 +10,14 @@ class AuthorEntry:
         author_name: str = "Default",
         foreground: QColor = QColor("#ffffff"),
         background: QColor = QColor("#a6a6a6"),
-        weight: int = 100,
+        weight: int = 50,
         italic: bool = True,
         href: str = "www.example.com",
     ):
         self.author_name = author_name
         self.foreground = foreground if type(foreground) == QColor else QColor(foreground)
         self.background = background if type(background) == QColor else QColor(background)
-        self.weight = weight if type(weight) == int else 100
+        self.weight = weight if type(weight) == int else 50
         self.italic = italic
         self.href = href
 

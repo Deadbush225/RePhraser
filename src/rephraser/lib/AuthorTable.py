@@ -22,7 +22,6 @@ class AddAuthorDialog(QDialog):
     def __init__(self, entry, parent=None):
         super(QDialog, self).__init__(parent=parent)
 
-        print("TST")
         p = entry.getProperties(include_name=True)
         print(p)
 
@@ -64,15 +63,13 @@ class AddAuthorDialog(QDialog):
         self.weight_spinbox = QSpinBox()
         self.weight_spinbox.setMinimum(0)
         self.weight_spinbox.setMaximum(100)
-        self.weight_spinbox.setSingleStep(1000)
+        self.weight_spinbox.setSingleStep(10)
         self.weight_spinbox.setValue(weight)
         weight_cont.addWidget(self.weight_spinbox)
 
         formatting_cont = QHBoxLayout()
         self.isItalic = QCheckBox("Italic")
         self.isItalic.setChecked(italic)
-        # self.isBold = QCheckBox("Bold")
-        # formatting_cont.addWidget(self.isBold)
         formatting_cont.addWidget(self.isItalic)
 
         href_cont = QHBoxLayout()
