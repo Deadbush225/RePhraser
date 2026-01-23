@@ -14,29 +14,34 @@ class RibbonTab(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.main_window = parent
-        # self.setFixedHeight(90)  # Reduced from 120
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # self.root = QVBoxLayout(self)
         self.layout = QHBoxLayout(self)
-        self.layout.setContentsMargins(5, 5, 5, 5)  # Reduced from 10, 10, 10, 10
-        self.layout.setSpacing(10)  # Reduced from 15
+        self.layout.setContentsMargins(5, 3, 5, 3)  # Reduced margins
+        self.layout.setSpacing(8)  # Reduced spacing
+        # self.root.addLayout(self.layout)
+        # self.root.addStretch()
         
         
     def add_group(self, title, widgets):
         """Add a group of widgets with a title"""
         group_widget = QWidget()
         group_widget.setObjectName("ribbon_group")
-        # group_widget.setFixedHeight(75)  # Reduced from 100
+        group_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         group_layout = QVBoxLayout(group_widget)
-        group_layout.setContentsMargins(5, 3, 5, 3)  # Reduced from 8, 8, 8, 8
+        group_layout.setContentsMargins(3, 2, 3, 2)  # Minimal margins
         
         # Add title
         title_label = QLabel(title)
         title_label.setObjectName("ribbon_group_title")
+        title_label.setStyleSheet("color: #c3c3c3;")
         title_label.setAlignment(Qt.AlignCenter)
-        # title_label.setFixedHeight(12)  # Reduced from 16
+        title_label.setFixedHeight(25)
         
         # Create content layout
         content_layout = QHBoxLayout()
-        content_layout.setSpacing(2)  # Reduced from 3
+        content_layout.setSpacing(2)
+        content_layout.setContentsMargins(0, 0, 0, 0)
         
         # Add widgets
         for widget in widgets:
@@ -66,7 +71,7 @@ class RibbonTab(QWidget):
         
         group_layout.addWidget(title_label)
         group_layout.addLayout(content_layout)
-        group_layout.addStretch()
+        # Remove the addStretch() to minimize height
         
         # Add separator line
         separator = QFrame()
@@ -82,7 +87,6 @@ class RibbonTab(QWidget):
         
         self.layout.addWidget(group_widget)
         self.layout.addWidget(separator)
-
 
 class EditTab(RibbonTab):
     """Edit tab containing file operations and text editing tools"""
@@ -159,7 +163,6 @@ class EditTab(RibbonTab):
         
         # Font family
         self.main_window.fonts = QFontComboBox()
-        # self.main_window.fonts.setFixedHeight(25)  # Reduced from 30
         self.main_window.fonts.currentFontChanged.connect(self.update_fontFamily)
         font = QFont("Lexend", 12)
         self.main_window.fonts.setCurrentFont(font)
@@ -168,8 +171,6 @@ class EditTab(RibbonTab):
         
         # Font size
         self.main_window.fontsize = QComboBox()
-        # self.main_window.fontsize.setFixedHeight(25)  # Reduced from 30
-        # self.main_window.fontsize.setFixedWidth(60)
         self.main_window.fontsize.addItems([str(s) for s in FONT_SIZES])
         self.main_window.fontsize.currentIndexChanged[str].connect(self.update_size)
         format_widgets.append(self.main_window.fontsize)
@@ -429,45 +430,46 @@ class AuthorTab(RibbonTab):
         
         # Author combo box with label
         author_container = QWidget()
-        author_layout = QVBoxLayout(author_container)
+        author_container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        author_layout = QHBoxLayout(author_container)
         author_layout.setContentsMargins(0, 0, 0, 0)
+        author_layout.setSpacing(2)
         
-        author_label = QLabel("Current Author:")
-        author_label.setAlignment(Qt.AlignCenter)
+        # author_label = QLabel("Current Author:")
+        # author_label.setAlignment(Qt.AlignCenter)
+        # author_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         
         self.main_window.author_combo = AuthorComboBox(parent=self.main_window)
-        # self.main_window.author_combo.setFixedHeight(28)  # Reduced from 35
-        # self.main_window.author_combo.setMinimumWidth(200)
+        self.main_window.author_combo.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.main_window.author_combo.setMinimumWidth(150)
         
-        author_layout.addWidget(author_label)
+        # author_layout.addWidget(author_label)
         author_layout.addWidget(self.main_window.author_combo)
         
         selection_widgets.append(author_container)
         
-        self.add_group("Selection", selection_widgets)
+        self.add_group("Current Author", selection_widgets)
         
         # Author Management group
         management_widgets = []
         
         # Create horizontal layout for buttons
         button_container = QWidget()
+        button_container.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         button_layout = QHBoxLayout(button_container)
         button_layout.setContentsMargins(0, 0, 0, 0)
-        button_layout.setSpacing(3)
+        button_layout.setSpacing(2)
         
         add_btn = QPushButton("Add Author")
-        # add_btn.setFixedHeight(20)  # Reduced from 25
         add_btn.clicked.connect(lambda: self.main_window.author_combo.addAuthor())
         
         edit_btn = QPushButton("Edit Author")
-        # edit_btn.setFixedHeight(20)  # Reduced from 25
         edit_btn.clicked.connect(
             lambda: self.main_window.author_combo.addAuthor(self.main_window.author_combo.currentText())
             if self.main_window.author_combo.currentText() != "None" else None
         )
         
         remove_btn = QPushButton("Remove Author")
-        # remove_btn.setFixedHeight(20)  # Reduced from 25
         remove_btn.clicked.connect(self.main_window.author_combo.removeCurrentAuthor)
         
         button_layout.addWidget(add_btn)
@@ -482,8 +484,6 @@ class AuthorTab(RibbonTab):
         reset_widgets = []
         
         reset_btn = QPushButton("Reset Format")
-        # reset_btn.setFixedHeight(30)  # Reduced from 40
-        # reset_btn.setFixedWidth(100)
         reset_btn.clicked.connect(lambda: self.main_window.editor.resetToDefaultFormat())
         reset_widgets.append(reset_btn)
         
@@ -499,6 +499,7 @@ class RibbonWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.main_window = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.setup_ui()
         
     def setup_ui(self):
@@ -508,7 +509,7 @@ class RibbonWidget(QWidget):
         
         # Create tab widget
         self.tab_widget = QTabWidget()
-        # self.tab_widget.setFixedHeight(110)  # Reduced from 150
+        self.tab_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         
         # Create tabs
         self.edit_tab = EditTab(self.main_window)
@@ -519,58 +520,3 @@ class RibbonWidget(QWidget):
         self.tab_widget.addTab(self.author_tab, "Author")
         
         layout.addWidget(self.tab_widget)
-        
-        # Apply styling
-        self.apply_styling()
-    
-    def apply_styling(self):
-        """Apply ribbon-style CSS"""
-        # self.tab_widget.setStyleSheet("""
-        #     QTabWidget::pane {
-        #         border: 1px solid #44485f;
-        #         background-color: #24273a;
-        #     }
-            
-        #     QTabBar::tab {
-        #         background-color: #363a4f;
-        #         color: #cad3f5;
-        #         padding: 4px 16px;
-        #         margin-right: 2px;
-        #         border-top-left-radius: 4px;
-        #         border-top-right-radius: 4px;
-        #         border: 1px solid #44485f;
-        #         border-bottom: none;
-        #     }
-            
-        #     QTabBar::tab:selected {
-        #         background-color: #24273a;
-        #         color: #c6a0f6;
-        #         font-weight: bold;
-        #     }
-            
-        #     QTabBar::tab:hover:!selected {
-        #         background-color: #44485f;
-        #     }
-            
-        #     QPushButton {
-        #         background-color: #363a4f;
-        #         border: 1px solid #44485f;
-        #         border-radius: 4px;
-        #         color: #cad3f5;
-        #         padding: 2px 6px;
-        #         min-width: 50px;
-        #     }
-            
-        #     QPushButton:hover {
-        #         background-color: #44485f;
-        #         border-color: #5b6078;
-        #     }
-            
-        #     QPushButton:pressed {
-        #         background-color: #494d64;
-        #     }
-            
-        #     QLabel {
-        #         color: #cad3f5;
-        #     }
-        # """)
