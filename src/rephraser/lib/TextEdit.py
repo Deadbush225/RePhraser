@@ -48,8 +48,11 @@ class PasteFromAuthorDialog(QDialog):
         self.setLayout(mainlayout)
 
     def addNewAuthor(self):
-        self.parent_.parent_.author_table.addAuthor("")
-        self.fillComboBox()
+        if hasattr(self.parent_.parent_, 'author_combo'):
+            self.parent_.parent_.author_combo.addAuthor("")
+            self.fillComboBox()
+        else:
+            Logger.w("Author combo not found", Logger.WARNING)
 
     def fillComboBox(self):
         self.author_cmbx.clear()
@@ -86,6 +89,10 @@ class TextEdit(QTextEdit):
         self.verticalScrollBar().setStyle(
             QCommonStyle()
         )  # to make the transparency work
+        
+        # Enable custom context menu
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
 
     def dropEvent(self, event):
         m = event.mimeData()
@@ -152,7 +159,7 @@ class TextEdit(QTextEdit):
                 te = PasteFromAuthorDialog(parent=self)
 
                 enable_dark_titlebar(te)
-                te.author_selected.connect(self.setTextCharFormat)
+                te.author_selected.connect(self.setCharFormatSelection)
                 if te.exec_() == QDialog.Rejected:
                     self.textCharFormat = self.defaultCharFormat
 
@@ -196,9 +203,9 @@ class TextEdit(QTextEdit):
     def removeCharFormatSelection(self):
         self.textCursor().setCharFormat(self.defaultCharFormat)
 
-    def setTextCharFormat(self, authorName):
-        self.defaultCharFormat.setFontItalic(self.fontItalic())
-        self.defaultCharFormat.setFontWeight(self.fontWeight())
+    def setCharFormatSelection(self, authorName):
+        # self.defaultCharFormat.setFontItalic(self.fontItalic())
+        # self.defaultCharFormat.setFontWeight(self.fontWeight())
 
         prop = store.author_dictionary[authorName]
         Logger.w(prop, Logger.INFO)
@@ -232,7 +239,153 @@ class TextEdit(QTextEdit):
         self.textCharFormat.setForeground(QColor(prop["foreground"]))
         self.textCharFormat.setBackground(QColor(prop["background"]))
 
+        # write the text
         self.textCursor().setCharFormat(self.textCharFormat)
+
+    def setDefaultCharFormat(self, authorName: str):
+        prop = store.author_dictionary[authorName]
+        Logger.w(prop, Logger.INFO)
+
+        # Create a new format based on current font to preserve font family and size
+        self.defaultCharFormat = QTextCharFormat(self.defaultCharFormat)
+        self.defaultCharFormat.setFont(self.currentFont())
+        self.defaultCharFormat.setFontPointSize(self.fontPointSize())
+        
+        # Apply italic formatting
+        self.defaultCharFormat.setFontItalic(prop["italic"])
+        
+        # Convert weight to Qt font weight system
+        # Qt uses: Light=25, Normal=50, DemiBold=63, Bold=75, Black=87
+        # Convert from 0-100 scale to Qt scale
+        weight_value = prop["weight"]
+        if weight_value >= 90:
+            qt_weight = QFont.Black  # 87
+        elif weight_value >= 70:
+            qt_weight = QFont.Bold  # 75
+        elif weight_value >= 55:
+            qt_weight = QFont.DemiBold  # 63
+        elif weight_value >= 35:
+            qt_weight = QFont.Normal  # 50
+        else:
+            qt_weight = QFont.Light  # 25
+        
+        self.defaultCharFormat.setFontWeight(qt_weight)
+        
+        # Apply colors
+        self.defaultCharFormat.setForeground(QColor(prop["foreground"]))
+        self.defaultCharFormat.setBackground(QColor(prop["background"]))
+    
+    def resetToDefaultFormat(self):
+        """Reset to default format (no author)"""
+        self.defaultCharFormat = QTextCharFormat()
+        font = QFont("Lexend", 12)
+        self.defaultCharFormat.setFont(font)
+        self.defaultCharFormat.setFontPointSize(12)
+        self.defaultCharFormat.setForeground(Qt.GlobalColor.white)
+        self.defaultCharFormat.setBackground(Qt.GlobalColor.transparent)
+        self.defaultCharFormat.setFontWeight(QFont.Normal)
+        self.defaultCharFormat.setFontItalic(False)
+        
+        # Apply default format to cursor
+        cursor = self.textCursor()
+        cursor.setCharFormat(self.defaultCharFormat)
+        self.setTextCursor(cursor)
+    
+    def showContextMenu(self, position):
+        """Show context menu for changing author of selected text"""
+        cursor = self.textCursor()
+        
+        if not cursor.hasSelection():
+            # Show default context menu if no selection
+            menu = self.createStandardContextMenu()
+            menu.exec_(self.mapToGlobal(position))
+            return
+        
+        menu = QMenu(self)
+        
+        # Add "Change Author" submenu
+        author_menu = menu.addMenu("Change Author to...")
+        
+        # Add "None" option
+        none_action = author_menu.addAction("None")
+        none_action.triggered.connect(lambda: self.changeSelectionAuthor(None))
+        
+        # Add separator
+        author_menu.addSeparator()
+        
+        # Add all authors
+        for author_name in store.author_dictionary.keys():
+            action = author_menu.addAction(author_name)
+            action.triggered.connect(lambda checked, name=author_name: self.changeSelectionAuthor(name))
+        
+        # Add separator and standard actions
+        menu.addSeparator()
+        
+        # Add standard cut/copy/paste actions
+        if cursor.hasSelection():
+            cut_action = menu.addAction("Cut")
+            cut_action.triggered.connect(self.cut)
+            
+            copy_action = menu.addAction("Copy")
+            copy_action.triggered.connect(self.copy)
+        
+        paste_action = menu.addAction("Paste")
+        paste_action.triggered.connect(self.paste)
+        paste_action.setEnabled(QApplication.clipboard().mimeData().hasText())
+        
+        # Show menu
+        menu.exec_(self.mapToGlobal(position))
+    
+    def changeSelectionAuthor(self, author_name):
+        """Change the author format of selected text"""
+        cursor = self.textCursor()
+        
+        if not cursor.hasSelection():
+            return
+        
+        if author_name is None:
+            # Reset to default format
+            format_to_apply = QTextCharFormat()
+            font = QFont("Lexend", 12)
+            format_to_apply.setFont(font)
+            format_to_apply.setFontPointSize(self.fontPointSize())
+        else:
+            # Apply author format
+            prop = store.author_dictionary[author_name]
+            format_to_apply = QTextCharFormat()
+            format_to_apply.setFont(self.currentFont())
+            format_to_apply.setFontPointSize(self.fontPointSize())
+            
+            # Apply italic formatting
+            format_to_apply.setFontItalic(prop["italic"])
+            
+            # Convert weight to Qt font weight system
+            weight_value = prop["weight"]
+            if weight_value >= 90:
+                qt_weight = QFont.Black  # 87
+            elif weight_value >= 70:
+                qt_weight = QFont.Bold  # 75
+            elif weight_value >= 55:
+                qt_weight = QFont.DemiBold  # 63
+            elif weight_value >= 35:
+                qt_weight = QFont.Normal  # 50
+            else:
+                qt_weight = QFont.Light  # 25
+            
+            format_to_apply.setFontWeight(qt_weight)
+            
+            # Apply colors
+            format_to_apply.setForeground(QColor(prop["foreground"]))
+            format_to_apply.setBackground(QColor(prop["background"]))
+        
+        # Apply format to selection
+        cursor.beginEditBlock()
+        cursor.mergeCharFormat(format_to_apply)
+        cursor.endEditBlock()
+        
+        # Update cursor
+        self.setTextCursor(cursor)
+        
 
     def resizeEvent(self, e):
         # print(f"{self.document().idealWidth()} : {self.width()}")

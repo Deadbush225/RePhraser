@@ -6,7 +6,7 @@ from PyQt5.QtPrintSupport import *
 import os
 import math
 
-from rephraser.lib.AuthorTable import AuthorTable
+from rephraser.lib.AuthorComboBox import AuthorComboBox
 from rephraser.lib.ScrollBar import ScrollBar
 from rephraser.lib.TextEdit import TextEdit
 from rephraser.lib.helper import *
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
         if self.dockwidget in dock_widgets:
             return
 
-        self.dockwidget = QDockWidget("Change Author")
+        self.dockwidget = QDockWidget("Author Selection")
         self.dockwidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.dockwidget.setMaximumWidth(300)
         self.dockwidget.setMinimumWidth(165)
@@ -43,17 +43,40 @@ class MainWindow(QMainWindow):
         self.dockwidget.setWidget(dock_innerContainer)
         dock_layout = QVBoxLayout(dock_innerContainer)
 
-        self.author_table = AuthorTable(parent=self)
-        dock_layout.addWidget(self.author_table)
+        # Author selection label and combo box
+        author_label = QLabel("Current Author:")
+        # dock_layout.addWidget(author_label)
+        
+        self.author_combo = AuthorComboBox(parent=self)
+        # dock_layout.addWidget(self.author_combo)
+        author_layout = QHBoxLayout()
+        author_layout.addWidget(author_label)
+        author_layout.addWidget(self.author_combo)
+        dock_layout.addLayout(author_layout)
 
-        addAuthor_btn = QPushButton("Add Author")
-        addAuthor_btn.clicked.connect(lambda: self.author_table.addAuthor())
+        # Buttons
+        button_layout = QHBoxLayout()
+        
+        addAuthor_btn = QPushButton("Add")
+        addAuthor_btn.clicked.connect(lambda: self.author_combo.addAuthor())
 
-        resetFmt_btn = QPushButton("Reset Format")
-        resetFmt_btn.clicked.connect(lambda: self.editor.removeCharFormatSelection())
+        editAuthor_btn = QPushButton("Edit")
+        editAuthor_btn.clicked.connect(lambda: self.author_combo.addAuthor(self.author_combo.currentText())
+                                      if self.author_combo.currentText() != "None" else None)
 
-        dock_layout.addWidget(addAuthor_btn)
-        dock_layout.addWidget(resetFmt_btn)
+        removeAuthor_btn = QPushButton("Remove")
+        removeAuthor_btn.clicked.connect(self.author_combo.removeCurrentAuthor)
+        
+        button_layout.addWidget(addAuthor_btn)
+        button_layout.addWidget(editAuthor_btn)
+        button_layout.addWidget(removeAuthor_btn)
+        
+        dock_layout.addLayout(button_layout)
+
+        # resetFmt_btn = QPushButton("Reset Format")
+        # resetFmt_btn.clicked.connect(lambda: self.editor.resetToDefaultFormat())
+
+        # dock_layout.addWidget(resetFmt_btn)
 
         self.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
 

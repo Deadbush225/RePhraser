@@ -235,7 +235,7 @@ class AuthorTable(QTableWidget):
 
         author_name = self.cellWidget(selected_row, 0).text()
 
-        self.parent_.editor.setTextCharFormat(author_name)
+        self.parent_.editor.setCharFormatSelection(author_name)
         self.parent_.editor.setFocus()
 
     def mousePressEvent(self, e):
