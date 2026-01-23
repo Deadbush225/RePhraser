@@ -243,6 +243,7 @@ class TextEdit(QTextEdit):
         self.textCursor().setCharFormat(self.textCharFormat)
 
     def setDefaultCharFormat(self, authorName: str):
+        if authorName == '': return
         prop = store.author_dictionary[authorName]
         Logger.w(prop, Logger.INFO)
 

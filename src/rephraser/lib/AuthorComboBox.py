@@ -2,11 +2,75 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
-from ..lib.Logger import Logger
-from ..lib.ClickableLabel import ClickableLabel
-from ..lib.AuthorEntry import AuthorEntry
-from ..lib.Stores import store
-from ..lib.DarkPallete import enable_dark_titlebar
+from rephraser.lib.Logger import Logger
+from rephraser.lib.ClickableLabel import ClickableLabel
+from rephraser.lib.AuthorEntry import AuthorEntry
+from rephraser.lib.Stores import store
+from rephraser.lib.DarkPallete import enable_dark_titlebar
+
+
+class AuthorItemDelegate(QStyledItemDelegate):
+    """Custom delegate to render author items with their formatting"""
+    
+    def paint(self, painter, option, index):
+        # Get author name and properties
+        author_name = index.data(Qt.DisplayRole)
+        
+        if author_name == "None":
+            # Use default rendering for "None" option
+            super().paint(painter, option, index)
+            return
+        
+        # Get author properties from store
+        if author_name not in store.author_dictionary:
+            super().paint(painter, option, index)
+            return
+        
+        props = store.author_dictionary[author_name]
+        
+        # Set up painter
+        painter.save()
+        
+        # Draw background
+        if option.state & QStyle.State_Selected:
+            painter.fillRect(option.rect, option.palette.highlight())
+        else:
+            painter.fillRect(option.rect, QColor(props["background"]))
+        
+        # Set up font
+        font = QFont("Lexend", 11)
+        font.setItalic(props["italic"])
+        
+        # Convert weight to Qt font weight
+        weight_value = props["weight"]
+        if weight_value >= 90:
+            font.setWeight(QFont.Black)
+        elif weight_value >= 70:
+            font.setWeight(QFont.Bold)
+        elif weight_value >= 55:
+            font.setWeight(QFont.DemiBold)
+        elif weight_value >= 35:
+            font.setWeight(QFont.Normal)
+        else:
+            font.setWeight(QFont.Light)
+        
+        painter.setFont(font)
+        
+        # Set text color
+        if option.state & QStyle.State_Selected:
+            painter.setPen(option.palette.highlightedText().color())
+        else:
+            painter.setPen(QColor(props["foreground"]))
+        
+        # Draw text centered
+        text_rect = option.rect.adjusted(4, 2, -4, -2)
+        painter.drawText(text_rect, Qt.AlignCenter, author_name)
+        
+        painter.restore()
+    
+    def sizeHint(self, option, index):
+        """Return appropriate size for items"""
+        return QSize(200, 30)
 
 
 class AuthorComboBox(QComboBox):
@@ -18,6 +82,12 @@ class AuthorComboBox(QComboBox):
         super().__init__(parent)
         self.parent_ = parent
         self.settings = QSettings("DeadBush225", "RePhraser")
+        
+        # Set custom delegate for styling
+        self.setItemDelegate(AuthorItemDelegate())
+        
+        # Set minimum height for better appearance
+        self.setMinimumHeight(35)
         
         # Load author dictionary from settings
         store.author_dictionary = self.settings.value("authors")
@@ -52,26 +122,80 @@ class AuthorComboBox(QComboBox):
         # Connect signals
         self.currentTextChanged.connect(self.onAuthorChanged)
     
+    def paintEvent(self, event):
+        """Custom paint event to show current selection with author styling"""
+        painter = QStylePainter(self)
+        painter.setPen(self.palette().color(QPalette.Text))
+        
+        # Draw the combobox frame and arrow
+        opt = QStyleOptionComboBox()
+        self.initStyleOption(opt)
+        
+        # Get current text
+        current_text = self.currentText()
+        
+        if current_text != "None" and current_text in store.author_dictionary:
+            # Apply author styling to the current selection display
+            props = store.author_dictionary[current_text]
+            
+            # Set background color
+            opt.palette.setColor(QPalette.Button, QColor(props["background"]))
+            opt.palette.setColor(QPalette.ButtonText, QColor(props["foreground"]))
+            
+            # Draw combo box with custom colors
+            painter.drawComplexControl(QStyle.CC_ComboBox, opt)
+            
+            # Draw the text with custom font
+            font = QFont("Lexend", 11)
+            font.setItalic(props["italic"])
+            
+            weight_value = props["weight"]
+            if weight_value >= 90:
+                font.setWeight(QFont.Black)
+            elif weight_value >= 70:
+                font.setWeight(QFont.Bold)
+            elif weight_value >= 55:
+                font.setWeight(QFont.DemiBold)
+            elif weight_value >= 35:
+                font.setWeight(QFont.Normal)
+            else:
+                font.setWeight(QFont.Light)
+            
+            painter.setFont(font)
+            painter.setPen(QColor(props["foreground"]))
+            
+            # Calculate text rect (avoiding the arrow area)
+            text_rect = self.style().subControlRect(QStyle.CC_ComboBox, opt, QStyle.SC_ComboBoxEditField, self)
+            text_rect.adjust(4, 0, -4, 0)
+            
+            painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, current_text)
+        else:
+            # Default rendering for "None" and other cases
+            painter.drawComplexControl(QStyle.CC_ComboBox, opt)
+            painter.drawControl(QStyle.CE_ComboBoxLabel, opt)
+    
     def populateComboBox(self):
         """Populate the combo box with authors"""
+        current_selection = self.currentText()
         self.clear()
         
         # Add "None" as default option
         self.addItem("None")
         
         # Add all authors from dictionary
-        for author_name, properties in store.author_dictionary.items():
+        for author_name in store.author_dictionary.keys():
             self.addItem(author_name)
-            
-            # Create styled label for the item
-            entry = AuthorEntry(author_name, **properties)
-            
-            # Get the item and apply custom styling
-            item_index = self.count() - 1
-            item = self.model().item(item_index)
-            
-            # Set custom data for styling
-            item.setData(entry.getStyleSheet(), Qt.UserRole)
+        
+        # Restore selection if it still exists
+        if current_selection and current_selection != "":
+            index = self.findText(current_selection)
+            if index >= 0:
+                self.setCurrentIndex(index)
+            else:
+                self.setCurrentIndex(0)  # Default to "None"
+        
+        # Force a repaint to update styling
+        self.update()
     
     def onAuthorChanged(self, author_name):
         """Handle author selection change"""
@@ -84,6 +208,8 @@ class AuthorComboBox(QComboBox):
             if self.parent_ and hasattr(self.parent_, 'editor'):
                 self.parent_.editor.setDefaultCharFormat(author_name)
         
+        # Trigger repaint to update styling
+        self.update()
         self.author_changed.emit(author_name)
     
     def addAuthor(self, author_name=""):
@@ -115,6 +241,9 @@ class AuthorComboBox(QComboBox):
         index = self.findText(entry.author_name)
         if index >= 0:
             self.setCurrentIndex(index)
+        
+        # Update display
+        self.update()
     
     def removeCurrentAuthor(self):
         """Remove currently selected author"""
