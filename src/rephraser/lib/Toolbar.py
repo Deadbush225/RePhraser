@@ -176,7 +176,6 @@ class Toolbar(QToolBar):
         # and set as the pointsize. We could also use the index + retrieve from FONT_SIZES.
         self.parent().fontsize.currentIndexChanged[str].connect(
             self.update_size
-            # lambda s: self.parent().editor.setFontPointSize(float(s))
         )
         self.format_toolbar.addWidget(self.parent().fontsize)
 
@@ -189,9 +188,7 @@ class Toolbar(QToolBar):
         self.parent().bold_action.setShortcut(QKeySequence.Bold)
         self.parent().bold_action.setCheckable(True)
         self.parent().bold_action.toggled.connect(
-            lambda x: self.parent().editor.setFontWeight(
-                QFont.Bold if x else QFont.Normal
-            )
+            self.update_weight
         )
         self.format_toolbar.addAction(self.parent().bold_action)
         format_menu.addAction(self.parent().bold_action)
@@ -206,7 +203,7 @@ class Toolbar(QToolBar):
         self.parent().italic_action.setStatusTip("Italic")
         self.parent().italic_action.setShortcut(QKeySequence.Italic)
         self.parent().italic_action.setCheckable(True)
-        self.parent().italic_action.toggled.connect(self.parent().editor.setFontItalic)
+        self.parent().italic_action.toggled.connect(self.update_italic)
         self.format_toolbar.addAction(self.parent().italic_action)
         format_menu.addAction(self.parent().italic_action)
 
@@ -326,6 +323,15 @@ class Toolbar(QToolBar):
         view_menu.addAction(reset_view_action)
 
         self.parent().editor.cursorPositionChanged.connect(self.update_format)
+
+    def update_weight(self, is_bold: bool):
+        weight = QFont.Bold if is_bold else QFont.Normal
+        self.parent().editor.defaultCharFormat.setFontWeight(weight)
+        self.parent().editor.setFontWeight(weight)
+
+    def update_italic(self, is_italic: bool):
+        self.parent().editor.setFontItalic(is_italic)
+        self.parent().editor.defaultCharFormat.setFontItalic(is_italic)
 
     def update_fontFamily(self, font: QFont):
         self.parent().editor.setFontFamily(font.family())
