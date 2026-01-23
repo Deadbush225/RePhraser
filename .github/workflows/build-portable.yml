@@ -27,34 +27,21 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || pip install PyQt5>=5.15.10
+          pip install PyQt5>=5.15.10
           pip install pyinstaller
           pip install .
 
       - name: Build Windows portable executable
+        env:
+          VERSION: ${{ github.ref_name }}
         run: |
-          pyinstaller --name "RePhraser" ^
-            --windowed ^
-            --onefile ^
-            --icon "src/rephraser/Rephraser.ico" ^
-            --add-data "src/rephraser/dark.qss;rephraser" ^
-            --add-data "src/rephraser/login.qss;rephraser" ^
-            --add-data "src/rephraser/Rephraser.ico;rephraser" ^
-            --add-data "src/rephraser/Rephraser.png;rephraser" ^
-            --add-data "src/rephraser/images;rephraser/images" ^
-            --hidden-import "PyQt5.sip" ^
-            --clean ^
-            src/rephraser/__main__.py
-
-      - name: Rename Windows executable
-        run: |
-          move "dist\RePhraser.exe" "RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe"
+          .\build-portable.bat --no-pause
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-portable
-          path: RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe
+          path: dist/RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe
 
   build-linux:
     runs-on: ubuntu-latest
@@ -70,51 +57,37 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install system dependencies
+      - name: Install minimal system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            python3-pyqt5 \
-            python3-pyqt5.qtwidgets \
-            pyqt5-dev-tools \
-            qttools5-dev-tools \
-            libqt5gui5 \
-            libqt5core5a \
-            libqt5widgets5 \
-            libxcb-xinerama0
+          # Only install absolutely essential packages to avoid repository issues
+          sudo apt-get update -qq || echo "Update failed, continuing..."
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            libglib2.0-0 \
+            libgl1-mesa-glx || echo "Some packages failed, continuing..."
 
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt || pip install PyQt5>=5.15.10
-          pip install pyinstaller
-          pip install .
+          python -m pip install --upgrade pip setuptools wheel
+          # Try to install PyQt5 with binary wheels first, fallback to source if needed
+          python -m pip install --only-binary=all PyQt5>=5.15.10 || python -m pip install PyQt5>=5.15.10
+          python -m pip install pyinstaller
+          # Install the project in development mode
+          python -m pip install -e .
 
       - name: Build Linux portable executable
+        env:
+          VERSION: ${{ github.ref_name }}
+          QT_QPA_PLATFORM: offscreen
         run: |
-          pyinstaller --name "rephraser" \
-            --windowed \
-            --onefile \
-            --icon "src/rephraser/Rephraser.ico" \
-            --add-data "src/rephraser/dark.qss:rephraser" \
-            --add-data "src/rephraser/login.qss:rephraser" \
-            --add-data "src/rephraser/Rephraser.ico:rephraser" \
-            --add-data "src/rephraser/Rephraser.png:rephraser" \
-            --add-data "src/rephraser/images:rephraser/images" \
-            --hidden-import "PyQt5.sip" \
-            --clean \
-            src/rephraser/__main__.py
-
-      - name: Rename Linux executable
-        run: |
-          mv "dist/rephraser" "RePhraser-${{ github.ref_name }}-Linux-x64-Portable"
-          chmod +x "RePhraser-${{ github.ref_name }}-Linux-x64-Portable"
+          chmod +x build-portable.sh
+          ./build-portable.sh
 
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-portable
-          path: RePhraser-${{ github.ref_name }}-Linux-x64-Portable
+          path: dist/RePhraser-${{ github.ref_name }}-Linux-x64-Portable
 
   create-release:
     needs: [build-windows, build-linux]

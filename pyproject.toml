@@ -12,9 +12,6 @@ license = { file = "LICENSE.txt" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: GNU Affero General Public License v3",
     "Operating System :: OS Independent",
@@ -23,7 +20,7 @@ classifiers = [
 ]
 keywords = ["rewrite", "text", "rephrase"]
 dependencies = ["PyQt5 >= 5.15.10"]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 # [project.optional-dependencies]
 # dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
