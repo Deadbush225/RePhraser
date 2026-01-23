@@ -15,13 +15,9 @@ class RibbonTab(QWidget):
         super().__init__(parent)
         self.main_window = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # self.root = QVBoxLayout(self)
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(5, 3, 5, 3)  # Reduced margins
         self.layout.setSpacing(8)  # Reduced spacing
-        # self.root.addLayout(self.layout)
-        # self.root.addStretch()
-        
         
     def add_group(self, title, widgets):
         """Add a group of widgets with a title"""
@@ -71,19 +67,15 @@ class RibbonTab(QWidget):
         
         group_layout.addWidget(title_label)
         group_layout.addLayout(content_layout)
-        # Remove the addStretch() to minimize height
         
         # Add separator line
         separator = QFrame()
         separator.setFrameShape(QFrame.VLine)
         separator.setFrameShadow(QFrame.Sunken)
         separator.setLineWidth(1)
-        # border-left: 1px solid #212121;
-        # border-right: 1px solid #4b4b4b;
-        # max-width: 0px;
         separator.setStyleSheet("""QFrame {
         background-color: #535353;       
-    }""")  # Reduced margin from 5px
+        }""")  # Reduced margin from 5px
         
         self.layout.addWidget(group_widget)
         self.layout.addWidget(separator)
@@ -434,11 +426,7 @@ class AuthorTab(RibbonTab):
         author_layout = QHBoxLayout(author_container)
         author_layout.setContentsMargins(0, 0, 0, 0)
         author_layout.setSpacing(2)
-        
-        # author_label = QLabel("Current Author:")
-        # author_label.setAlignment(Qt.AlignCenter)
-        # author_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        
+                
         self.main_window.author_combo = AuthorComboBox(parent=self.main_window)
         self.main_window.author_combo.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.main_window.author_combo.setMinimumWidth(150)
