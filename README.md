@@ -35,8 +35,8 @@ RePhraser helps you keep track of what you wrote and what you pasted from other 
 
 ### Features
 
-💬 Multiple fonts <br>
-📄 Rich text editor <br>
+🅰️ Multiple fonts <br>
+📰 Rich text editor <br>
 🖼️ Image support <br>
 👆 Drag-and-drop <br>
 📂 Saves and opens in HTML <br>
@@ -46,6 +46,11 @@ RePhraser helps you keep track of what you wrote and what you pasted from other 
 <div align="center"><img src="./docs/demo.gif" width="650"></img></div>
 
 ## Installation:
+### Releases
+
+Check out the [latest releases](https://github.com/Deadbush225/RePhrase/releases) to download pre-built versions.
+
+
 
 ### Requirements:
 
