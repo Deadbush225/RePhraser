@@ -10,8 +10,7 @@ import os
 from rephraser import basedir
 from PyQt5.QtGui import QIcon
 
-if __name__ == "__main__":
-
+def main():
     # try:
     app = QApplication(sys.argv)
 
@@ -48,3 +47,5 @@ if __name__ == "__main__":
     app.exec_()
 # except Exception as e:
 #     print(traceback.format_exc())
+if __name__ == "__main__":
+  main()
