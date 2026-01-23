@@ -13,3 +13,11 @@ class HLine(QFrame):
         self.setFrameShadow(QFrame.Sunken)
         self.setLineWidth(1)
         # self.setPalette(DarkPalette())
+
+class VLine(QFrame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFrameShape(QFrame.VLine)
+        self.setFrameShadow(QFrame.Sunken)
+        self.setLineWidth(1)
+        # self.setPalette(DarkPalette())

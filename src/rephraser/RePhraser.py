@@ -6,11 +6,10 @@ from PyQt5.QtPrintSupport import *
 import os
 import math
 
-from rephraser.lib.AuthorComboBox import AuthorComboBox
+from rephraser.lib.RibbonWidget import RibbonWidget
 from rephraser.lib.ScrollBar import ScrollBar
 from rephraser.lib.TextEdit import TextEdit
 from rephraser.lib.helper import *
-from rephraser.lib.Toolbar import Toolbar
 from rephraser.lib.DarkPallete import enable_dark_titlebar
 from rephraser.lib.Logger import Logger
 
@@ -25,74 +24,6 @@ HTML_EXTENSIONS = [".htm", ".html"]
 
 class MainWindow(QMainWindow):
     changed = False
-    dockwidget = None
-
-    def createDock(self):
-        dock_widgets = self.findChildren(QDockWidget)
-        if self.dockwidget in dock_widgets:
-            return
-
-        self.dockwidget = QDockWidget("Author Selection")
-        self.dockwidget.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.dockwidget.setMaximumWidth(300)
-        self.dockwidget.setMinimumWidth(165)
-
-        enable_dark_titlebar(self.dockwidget)
-
-        dock_innerContainer = QWidget()
-        self.dockwidget.setWidget(dock_innerContainer)
-        dock_layout = QVBoxLayout(dock_innerContainer)
-
-        # Author selection label and combo box
-        author_label = QLabel("Current Author:")
-        # dock_layout.addWidget(author_label)
-        
-        self.author_combo = AuthorComboBox(parent=self)
-        # dock_layout.addWidget(self.author_combo)
-        author_layout = QHBoxLayout()
-        author_layout.addWidget(author_label)
-        author_layout.addWidget(self.author_combo)
-        dock_layout.addLayout(author_layout)
-
-        # Buttons
-        button_layout = QHBoxLayout()
-        
-        addAuthor_btn = QPushButton("Add")
-        addAuthor_btn.clicked.connect(lambda: self.author_combo.addAuthor())
-
-        editAuthor_btn = QPushButton("Edit")
-        editAuthor_btn.clicked.connect(lambda: self.author_combo.addAuthor(self.author_combo.currentText())
-                                      if self.author_combo.currentText() != "None" else None)
-
-        removeAuthor_btn = QPushButton("Remove")
-        removeAuthor_btn.clicked.connect(self.author_combo.removeCurrentAuthor)
-        
-        button_layout.addWidget(addAuthor_btn)
-        button_layout.addWidget(editAuthor_btn)
-        button_layout.addWidget(removeAuthor_btn)
-        
-        dock_layout.addLayout(button_layout)
-
-        # resetFmt_btn = QPushButton("Reset Format")
-        # resetFmt_btn.clicked.connect(lambda: self.editor.resetToDefaultFormat())
-
-        # dock_layout.addWidget(resetFmt_btn)
-
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
-
-        # ━━━━━━━━━━━━━━━━━━━ Refresh Stylesheet ━━━━━━━━━━━━━━━━━━ #
-        if os.getenv("REPHRASER_DEBUG") == "1":
-          self.refresh_btn = QPushButton("Refresh stylesheet")
-          self.refresh_btn.clicked.connect(self.refresh_stylesheet)
-          dock_layout.addWidget(self.refresh_btn)
-
-        self.dockwidget.closeEvent = lambda event: self.on_dock_close(event)
-
-    def on_dock_close(self, event):
-        self.removeDockWidget(self.dockwidget)
-        self.dockwidget.deleteLater()
-        self.dockwidget = None
-        event.accept()
 
     def __init__(self):
         super().__init__()
@@ -107,51 +38,77 @@ class MainWindow(QMainWindow):
         self.path = None
         self.folder = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
 
-        self.layout = QVBoxLayout()
-
+        # Create text editor first (ribbon needs reference to it)
         self.editor = TextEdit(parent=self)
         self.editor.setVerticalScrollBar(ScrollBar(Qt.Vertical))
         self.editor.setTabStopDistance(40)
         self.editor.textChanged.connect(lambda: setattr(self, "changed", True))
 
-        # Setup the QTextEdit editor configuration
-        # self.editor.setAutoFormatting(QTextEdit.AutoAll)
+        # Create main layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
 
-        self.layout.addWidget(self.editor)
-        # layout.setSpacing(0)
-        # layout.setContentsMargins(5, 5, 5, 5)
+        # Create and add ribbon widget (after editor is created)
+        self.ribbon = RibbonWidget(self)
+        main_layout.addWidget(self.ribbon)
 
-        container = QWidget()
-        container.setLayout(self.layout)
+        # Add editor to layout
+        main_layout.addWidget(self.editor)
 
-        self.setCentralWidget(container)
-
+        # Status bar
         self.status = QStatusBar()
         self.setStatusBar(self.status)
 
-        # Uncomment to disable native menubar on Mac
-        # self.menuBar().setNativeMenuBar(False)
+        # Create menu bar (minimal - most functionality is in ribbon)
+        self.create_menu_bar()
 
-        # ━━━━━━━━━━━━━━━━━━━━━━━━ Toolbar ━━━━━━━━━━━━━━━━━━━━━━━━ #
-        file_toolbar = Toolbar("File", parent=self)
-
-        # ━━━━━━━━━━━━━━━━━━━━━━ Dock Widget ━━━━━━━━━━━━━━━━━━━━━━ #
-        self.createDock()
-
-        # Initialize default font size.
-        # self.editor.setFont(font)
-        # We need to repeat the size to init the current format.
+        # Initialize default font size
         self.editor.setFontPointSize(12)
 
-        # ━━━━━━━━━━━━━━━━━━ Initialize Contents ━━━━━━━━━━━━━━━━━━ #
-        # self.file_open(
-        #     os.path.join(os.path.dirname(os.path.dirname(__file__)), "test.html")
-        # )
-
-        # Initialize.
+        # Initialize
         self.update_title()
         self.setMinimumSize(QSize(780, 510))
         self.show()
+
+    def create_menu_bar(self):
+        """Create a minimal menu bar with essential items"""
+        menubar = self.menuBar()
+        
+        # File menu
+        file_menu = menubar.addMenu("&File")
+        
+        # View menu
+        view_menu = menubar.addMenu("&View")
+        
+        reset_view_action = QAction("Reset View", self)
+        reset_view_action.setStatusTip("Reset View")
+        reset_view_action.triggered.connect(self.reset_view)
+        view_menu.addAction(reset_view_action)
+        
+        # Help menu
+        help_menu = menubar.addMenu("&Help")
+        
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about)
+        help_menu.addAction(about_action)
+    
+    def reset_view(self):
+        """Reset the interface to default state"""
+        # Reset ribbon to first tab
+        self.ribbon.tab_widget.setCurrentIndex(0)
+        
+        # Reset author selection to "None"
+        if hasattr(self, 'author_combo'):
+            self.author_combo.setCurrentIndex(0)
+    
+    def show_about(self):
+        """Show about dialog"""
+        QMessageBox.about(self, "About RePhraser", 
+                         "RePhraser - A rich text editor with author attribution\n\n"
+                         "Version 1.0")
 
     def refresh_stylesheet(self):
         qApp.setStyleSheet("".join(open(os.path.join(basedir, "dark.qss")).readlines()))
