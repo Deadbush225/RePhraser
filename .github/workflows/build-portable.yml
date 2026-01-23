@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -51,7 +51,7 @@ jobs:
           move "dist\RePhraser.exe" "RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe"
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-portable
           path: RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe
@@ -66,7 +66,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -111,7 +111,7 @@ jobs:
           chmod +x "RePhraser-${{ github.ref_name }}-Linux-x64-Portable"
 
       - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-portable
           path: RePhraser-${{ github.ref_name }}-Linux-x64-Portable
@@ -125,7 +125,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create release
         uses: softprops/action-gh-release@v1
