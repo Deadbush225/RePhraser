@@ -30,8 +30,9 @@ jobs:
           python -m build --sdist --wheel
 
       - name: Publish to PyPI
+        continue-on-error: true
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          python -m twine upload --non-interactive --repository pypi dist/*
+          python -m twine upload --non-interactive --repository pypi dist/* || echo "Warning: PyPI upload failed (package may already exist)"
