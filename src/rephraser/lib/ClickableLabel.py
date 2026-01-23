@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QLabel, QColorDialog
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import pyqtSignal
 
+from rephraser.lib.Logger import Logger
 
 class ClickableLabel(QLabel):
 
@@ -20,7 +21,7 @@ class ClickableLabel(QLabel):
         self.clicked.emit()
 
     def changeColor(self):
-        print(f"Changing {self.color.name()}")
+        Logger.w(f"Changing {self.color.name()}", Logger.INFO)
         color = QColorDialog.getColor(
             initial=self.color,
             title="Select Color",
@@ -29,11 +30,6 @@ class ClickableLabel(QLabel):
         self.color = color if color.isValid() else self.color
         print(f"to {self.color.name()}")
 
-        # setting option
-        # dialog.setOption(QColorDialog.ShowAlphaChannel)
-
-        # executing the dialog
-        # dialog.exec_()
         self.redrawLabel()
 
     def redrawLabel(self):

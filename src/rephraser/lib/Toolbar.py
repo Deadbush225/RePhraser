@@ -218,7 +218,7 @@ class Toolbar(QToolBar):
         self.parent().underline_action.setShortcut(QKeySequence.Underline)
         self.parent().underline_action.setCheckable(True)
         self.parent().underline_action.toggled.connect(
-            self.parent().editor.setFontUnderline
+            self.update_underline
         )
         self.format_toolbar.addAction(self.parent().underline_action)
         format_menu.addAction(self.parent().underline_action)
@@ -333,6 +333,10 @@ class Toolbar(QToolBar):
         self.parent().editor.setFontItalic(is_italic)
         self.parent().editor.defaultCharFormat.setFontItalic(is_italic)
 
+    def update_underline(self, is_underline: bool):
+        self.parent().editor.setFontUnderline(is_underline)
+        self.parent().editor.defaultCharFormat.setFontUnderline(is_underline)
+
     def update_fontFamily(self, font: QFont):
         self.parent().editor.setFontFamily(font.family())
         self.parent().editor.defaultCharFormat.setFontFamily(font.family())
@@ -408,14 +412,19 @@ class Toolbar(QToolBar):
             if size_index >= 0:
                 self.parent().fontsize.setCurrentIndex(size_index)
 
-        # Update bold button
-        self.parent().bold_action.setChecked(current_font.weight() >= QFont.Bold)
+        # if char_format foreground and background is unmodified, update the buttons
+        if char_format.background() == self.parent().editor.defaultCharFormat.background():
+            # Update bold button
+            self.parent().bold_action.setChecked(current_font.weight() >= QFont.Bold)
+            self.update_weight(current_font.weight() >= QFont.Bold)
 
-        # Update italic button
-        self.parent().italic_action.setChecked(current_font.italic())
+            # Update italic button
+            self.parent().italic_action.setChecked(current_font.italic())
+            self.update_italic(current_font.italic())
 
-        # Update underline button
-        self.parent().underline_action.setChecked(current_font.underline())
+            # Update underline button
+            self.parent().underline_action.setChecked(current_font.underline())
+            self.update_underline(current_font.underline())
 
         # Update alignment buttons (paragraph-wide formatting)
         block_format = cursor.blockFormat()

@@ -2,8 +2,6 @@ from rephraser import project_dir
 
 from datetime import datetime
 import os
-import glob
-
 
 class Logger:
     DEBUG = "Debug"

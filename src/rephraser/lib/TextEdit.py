@@ -76,19 +76,16 @@ class TextEdit(QTextEdit):
         self.dropped_text = None
 
         self.textCharFormat = QTextCharFormat()
-        self.defaultCharFormat = QTextCharFormat()  # reset format
+        self.defaultCharFormat = QTextCharFormat() # reset format
         font = QFont("Lexend", 12)
         self.defaultCharFormat.setFont(font)
 
         self.images = {}
         self.DPM = math.floor(1 * 39.37)
 
-        # print(self.editor.verticalScrollBar().styleSheet())
         self.verticalScrollBar().setStyle(
             QCommonStyle()
         )  # to make the transparency work
-
-        # self.setDisabled(True)
 
     def dropEvent(self, event):
         m = event.mimeData()
@@ -191,11 +188,6 @@ class TextEdit(QTextEdit):
 
     def keyPressEvent(self, e):
         if e.text().isalnum() or (e.text() == " "):
-            self.defaultCharFormat.setFontWeight(QFont.Normal)
-            self.defaultCharFormat.setFontItalic(False)
-            # self.removeCharFormatSelection()
-            self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
-
             self.textCursor().insertText(e.text(), self.defaultCharFormat)
             return
 
@@ -212,7 +204,7 @@ class TextEdit(QTextEdit):
         Logger.w(prop, Logger.INFO)
 
         # Create a new format based on current font to preserve font family and size
-        self.textCharFormat = QTextCharFormat()
+        self.textCharFormat = QTextCharFormat(self.defaultCharFormat)
         self.textCharFormat.setFont(self.currentFont())
         self.textCharFormat.setFontPointSize(self.fontPointSize())
         
@@ -313,13 +305,7 @@ class TextEdit(QTextEdit):
         maximumImageWidth = self.minimumWidth() - 32
         maximumImageHeight = 400 - 32
         print(maximumImageWidth)
-        # if width >= maximumImageWidth:
-        # conssider padding
-        # factor = maximumImageWidth / widthv <-
-        # width *= factor <-
-        # height *= factor
 
-        # print(resource.value())
         width = ImageResource.width()
 
         if width > maximumImageWidth:
@@ -396,11 +382,3 @@ class TextEdit(QTextEdit):
         # Call parent implementation for proper handling
         super().setCurrentFont(font)
         self.setFocus()
-        #     doc = self.document()
-        #     doc_fmt = doc.defaultTextOption()
-        #     new_doc_fmt = QTextOption(doc_fmt)
-        #     self.document().setDefaultFont(font)
-
-        # # Call the parent implementation for non-selected text
-        # super().setCurrentFont(font)
-        # self.setFocus()

@@ -3,13 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
 
-import os
-import sys
-
-# import math
-
-# import traceback
-
+from ..lib.Logger import Logger 
 from ..lib.ClickableLabel import ClickableLabel
 from ..lib.AuthorEntry import AuthorEntry
 from ..lib.Stores import store
@@ -159,17 +153,13 @@ class AuthorTable(QTableWidget):
         keys = store.author_dictionary.keys()
         for author_name in keys:
             if not author_name in store.author_dictionary:
-                print(f"is '{author_name}' in {store.author_dictionary}?")
+                Logger.w(f"'{author_name}' not found in {store.author_dictionary}?", Logger.WARNING)
                 continue
-
-            # print("AUTHOR NAME")
-            # print(store.author_dictionary[author_name])
 
             self.addEntry(
                 AuthorEntry(author_name, **store.author_dictionary[author_name])
             )
 
-        # self.author_table.resizeColumnsToContents()
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -241,20 +231,11 @@ class AuthorTable(QTableWidget):
         self.setCellWidget(row_count, 0, signature_preview)
 
     def table_selection_changed(self, row, col):
-        print(f"SELECTION CHANGED {row}")
-        # selected_rows = {r.row() for r in self.selectedIndexes()}
-
-        # if len(selected_rows) != 1:
-        #     return
-
-        # print("CHANGING AUTHOR")
-        # selected_row = list(selected_rows)[0]
         selected_row = row
 
         author_name = self.cellWidget(selected_row, 0).text()
 
         self.parent_.editor.setTextCharFormat(author_name)
-        # self.parent_.editor.setCharFormatSelection()
         self.parent_.editor.setFocus()
 
     def mousePressEvent(self, e):

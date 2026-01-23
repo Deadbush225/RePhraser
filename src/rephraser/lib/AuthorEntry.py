@@ -1,8 +1,4 @@
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-
-# todo: use the Qt namespace colors
-
 
 class AuthorEntry:
     def __init__(
