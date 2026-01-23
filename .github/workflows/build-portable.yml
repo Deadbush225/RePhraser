@@ -1,0 +1,162 @@
+name: Build Portable Executables
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || pip install PyQt5>=5.15.10
+          pip install pyinstaller
+          pip install .
+
+      - name: Build Windows portable executable
+        run: |
+          pyinstaller --name "RePhraser" ^
+            --windowed ^
+            --onefile ^
+            --icon "src/rephraser/Rephraser.ico" ^
+            --add-data "src/rephraser/dark.qss;rephraser" ^
+            --add-data "src/rephraser/login.qss;rephraser" ^
+            --add-data "src/rephraser/Rephraser.ico;rephraser" ^
+            --add-data "src/rephraser/Rephraser.png;rephraser" ^
+            --add-data "src/rephraser/images;rephraser/images" ^
+            --hidden-import "PyQt5.sip" ^
+            --clean ^
+            src/rephraser/__main__.py
+
+      - name: Rename Windows executable
+        run: |
+          move "dist\RePhraser.exe" "RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe"
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-portable
+          path: RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pyqt5 \
+            python3-pyqt5.qtwidgets \
+            pyqt5-dev-tools \
+            qttools5-dev-tools \
+            libqt5gui5 \
+            libqt5core5a \
+            libqt5widgets5 \
+            libxcb-xinerama0
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || pip install PyQt5>=5.15.10
+          pip install pyinstaller
+          pip install .
+
+      - name: Build Linux portable executable
+        run: |
+          pyinstaller --name "rephraser" \
+            --windowed \
+            --onefile \
+            --icon "src/rephraser/Rephraser.ico" \
+            --add-data "src/rephraser/dark.qss:rephraser" \
+            --add-data "src/rephraser/login.qss:rephraser" \
+            --add-data "src/rephraser/Rephraser.ico:rephraser" \
+            --add-data "src/rephraser/Rephraser.png:rephraser" \
+            --add-data "src/rephraser/images:rephraser/images" \
+            --hidden-import "PyQt5.sip" \
+            --clean \
+            src/rephraser/__main__.py
+
+      - name: Rename Linux executable
+        run: |
+          mv "dist/rephraser" "RePhraser-${{ github.ref_name }}-Linux-x64-Portable"
+          chmod +x "RePhraser-${{ github.ref_name }}-Linux-x64-Portable"
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-portable
+          path: RePhraser-${{ github.ref_name }}-Linux-x64-Portable
+
+  create-release:
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "RePhraser ${{ github.ref_name }} - Portable"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## Portable Executables
+            
+            This release contains portable executables that don't require installation:
+            
+            ### Windows
+            - Download `RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe`
+            - Double-click to run (no installation needed)
+            - All dependencies are bundled
+            
+            ### Linux
+            - Download `RePhraser-${{ github.ref_name }}-Linux-x64-Portable`
+            - Make executable: `chmod +x RePhraser-${{ github.ref_name }}-Linux-x64-Portable`
+            - Run: `./RePhraser-${{ github.ref_name }}-Linux-x64-Portable`
+            
+            ### Notes
+            - These are single-file executables
+            - No installation or admin rights required
+            - Can be run from any location
+            - Settings will be saved in your user profile
+          files: |
+            windows-portable/RePhraser-${{ github.ref_name }}-Windows-x64-Portable.exe
+            linux-portable/RePhraser-${{ github.ref_name }}-Linux-x64-Portable
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

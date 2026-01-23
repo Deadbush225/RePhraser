@@ -12,8 +12,7 @@ from rephraser.lib.TextEdit import TextEdit
 from rephraser.lib.helper import *
 from rephraser.lib.DarkPallete import enable_dark_titlebar
 from rephraser.lib.Logger import Logger
-
-from rephraser import basedir
+from rephraser import basedir, get_version
 import rephraser.images.images  # Resource file for the icons
 from pathlib import Path
 
@@ -107,8 +106,7 @@ class MainWindow(QMainWindow):
     def show_about(self):
         """Show about dialog"""
         QMessageBox.about(self, "About RePhraser", 
-                         "RePhraser - A rich text editor with author attribution\n\n"
-                         "Version 1.0")
+                         f"RePhraser - A rich text editor with author attribution\n\nVersion {get_version()}")
 
     def refresh_stylesheet(self):
         qApp.setStyleSheet("".join(open(os.path.join(basedir, "dark.qss")).readlines()))
