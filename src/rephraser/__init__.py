@@ -9,7 +9,7 @@ and formatting attribution.
 import os
 from pathlib import Path
 
-__version__ = "0.0.2"
+__version__ = "1.0.3"
 __author__ = "EliazarInso"
 __email__ = "deadbush225@gmail.com"
 __description__ = "Rephrase essays and collage texts"
