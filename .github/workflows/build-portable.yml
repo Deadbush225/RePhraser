@@ -117,8 +117,8 @@ jobs:
         shell: pwsh
         run: |
           # Import the module that defines Write-ReleaseNotes
-          . "${{ github.workspace }}/scripts/eRelease/Write-ReleaseNotes.ps1"
-          $notesFile, $variableMap, $notesDir = Write-ReleaseNotes
+          . "${{ github.workspace }}/scripts/eRelease/eWrite-ReleaseNotes.ps1"
+          $notesFile, $variableMap, $notesDir, $allAssets = Write-ReleaseNotes
           
           # Add platform-specific binaries section to the release notes
           $binariesSection = @"
