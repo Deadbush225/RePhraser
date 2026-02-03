@@ -103,8 +103,6 @@ class TextEdit(QTextEdit):
 
     def canInsertFromMimeData(self, source):
         if source.hasImage():
-            # print("I CAN INSERT IMAGE")
-            # print(self.parent().path)
             # if not os.path.exist(self.parent().path):
             #     self.parent().file_save()
 
@@ -142,14 +140,9 @@ class TextEdit(QTextEdit):
             image = source.imageData()
 
             uuid = self.addImageResource(image)
-            # fragment = QTextDocumentFragment.fromHtml(
-            #     f"<img src='{source.text()}' height='{height}' width='{width}'></img>"
-            # )
-
-            # cursor.insertFragment(fragment)
+            
             self.setAlignment(Qt.AlignCenter)
             cursor.insertImage(uuid)
-            # cursor.insertImage(uuid)
             return
 
         elif source.hasText():
@@ -163,9 +156,7 @@ class TextEdit(QTextEdit):
                 if te.exec_() == QDialog.Rejected:
                     self.textCharFormat = self.defaultCharFormat
 
-                self.setCharFormatSelection()
                 self.textCursor().insertText(source.text(), self.textCharFormat)
-                self.removeCharFormatSelection()
             elif selectedTextIsBeingDragged:
                 self.textCursor().insertHtml(source.html())
 
