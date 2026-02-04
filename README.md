@@ -55,7 +55,11 @@ Check out the [latest releases](https://github.com/Deadbush225/RePhrase/releases
 - [x] python 3.9 or later
 - [x] PyQt5 5.15.10 or later
 
-> Recommended: create a virtual environment first
+> Recommended: ⚠️ create a virtual environment first
+> ```
+> python -m venv .venv
+> ./.venv/bin/activate.bat
+> ```
 
 ```
 pip install rephraser
@@ -95,4 +99,5 @@ Icons used in the application are from [Yusuke Kamiyaman](http://p.yusukekamiyam
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/eliazar-inso-0342b7210/
 [product-screenshot]: images/screenshot.png
+
 
