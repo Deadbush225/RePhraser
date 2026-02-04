@@ -35,11 +35,11 @@ RePhraser helps you keep track of what you wrote and what you pasted from other 
 
 ### Features
 
-🅰️ Multiple fonts <br>
-📰 Rich text editor <br>
-🖼️ Image support <br>
-👆 Drag-and-drop <br>
-📂 Saves and opens in HTML <br>
+1. 🅰️ Variation of fonts <br>
+2. 📰 Rich text editor support <br>
+3. 🖼️ Image insertion support <br>
+4. 👆 Drag-and-drop texts <br>
+5. 📂 Saves and opens files as HTML <br>
 
 ### Demo
 
@@ -50,8 +50,6 @@ RePhraser helps you keep track of what you wrote and what you pasted from other 
 
 Check out the [latest releases](https://github.com/Deadbush225/RePhrase/releases) to download pre-built versions.
 
-
-
 ### Requirements:
 
 - [x] python 3.9 or later
@@ -60,13 +58,13 @@ Check out the [latest releases](https://github.com/Deadbush225/RePhrase/releases
 > Recommended: create a virtual environment first
 
 ```
-pip install git+https://github.com/Deadbush225/RePhrase
+pip install rephraser
 ```
 
 ### Updates:
 
 ```
-pip install --upgrade git+https://github.com/Deadbush225/RePhrase
+pip install --upgrade rephraser
 ```
 
 ## Usage:
@@ -97,3 +95,4 @@ Icons used in the application are from [Yusuke Kamiyaman](http://p.yusukekamiyam
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/eliazar-inso-0342b7210/
 [product-screenshot]: images/screenshot.png
+
